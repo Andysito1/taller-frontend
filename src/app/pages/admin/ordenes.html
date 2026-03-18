@@ -1,0 +1,85 @@
+<div class="container-fluid p-4">
+  <header class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3">Gestión de Órdenes de Servicio</h1>
+    <!-- Botón para crear nueva orden -->
+  </header>
+
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <h5 class="card-title mb-3">Filtros de Búsqueda</h5>
+      <div class="row g-3 align-items-end">
+        <div class="col-md-7">
+          <label for="filtroBusqueda" class="form-label">Buscar por Cliente, Vehículo o ID de Orden</label>
+          <input id="filtroBusqueda" type="text" class="form-control" placeholder="Escriba nombre, placa o número de orden..." [value]="filtroBusqueda()" (input)="onFiltroBusquedaChange($event)">
+        </div>
+        <div class="col-md-3">
+          <label for="filtroEstado" class="form-label">Estado</label>
+          <select id="filtroEstado" class="form-select" [value]="filtroEstado()" (change)="onFiltroEstadoChange($event)">
+            <option value="">Todos</option>
+            @for (estado of estados; track estado.value) {
+              <option [value]="estado.value">{{ estado.label }}</option>
+            }
+          </select>
+        </div>
+        <div class="col-md-2">
+          <button class="btn btn-outline-secondary w-100" (click)="clearFilters()">Limpiar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="d-flex justify-content-center align-items-center" style="height: 200px;">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+  } @else if (error()) {
+    <div class="alert alert-danger" role="alert">
+      <strong>Error:</strong> {{ error() }}
+    </div>
+  } @else if (ordenes().length > 0) {
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead class="table-light">
+              <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Título</th>
+                <th scope="col">Cliente</th>
+                <th scope="col">Vehículo (Placa)</th>
+                <th scope="col">Mecánico</th>
+                <th scope="col">Fecha Inicio</th>
+                <th scope="col">Estado</th>
+                <th scope="col" class="text-end">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (orden of ordenes(); track orden.id) {
+                <tr>
+                  <td>{{ orden.id }}</td>
+                  <td>{{ orden.titulo }}</td>
+                  <td>{{ orden.vehiculo?.cliente?.usuario?.nombre || 'N/A' }}</td>
+                  <td>{{ orden.vehiculo?.marca }} - {{ orden.vehiculo?.modelo }} ({{ orden.vehiculo?.placa }})</td>
+                  <td>{{ orden.mecanico?.usuario?.nombre || 'Sin asignar' }}</td>
+                  <td>{{ orden.fecha_inicio | date:'shortDate' }}</td>
+                  <td>
+                    <span class="badge bg-secondary">{{ orden.estado }}</span>
+                  </td>
+                  <td class="text-end">
+                    <button class="btn btn-sm btn-outline-primary">Ver Detalle</button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div class="alert alert-info" role="alert">
+      No se encontraron órdenes de servicio con los filtros actuales.
+    </div>
+  }
+</div>

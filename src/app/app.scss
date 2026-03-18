@@ -30,3 +30,70 @@
   color: #6f42c1;
   font-weight: bold;
 }
+
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #1a1a1a;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  color: white;
+  transition: opacity 0.5s ease-out;
+  opacity: 1;
+
+  &.fade-out {
+    opacity: 0;
+    pointer-events: none; // Permite hacer clic a través mientras se desvanece
+  }
+
+  .loading-content {
+    text-align: center;
+    
+    .car-image {
+      width: 150px;
+      height: auto;
+      margin-bottom: 20px;
+      animation: bounce 2s infinite ease-in-out; 
+    }
+
+    p {
+      margin-top: 10px;
+      font-family: 'Arial', sans-serif;
+      letter-spacing: 1px;
+    }
+  }
+}
+
+.progress-bar-container {
+  width: 200px;
+  height: 6px;
+  background-color: #333;
+  border-radius: 3px;
+  margin: 0 auto;
+  overflow: hidden;
+  position: relative;
+
+  .progress-bar {
+    width: 0%;
+    height: 100%;
+    background-color: #e74c3c;
+    animation: progress 1s ease-out forwards; // Ajustado a 1 segundo
+  }
+}
+
+// Animaciones
+@keyframes progress {
+  0% { width: 0%; }
+  50% { width: 60%; }
+  100% { width: 100%; }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}

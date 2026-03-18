@@ -1,0 +1,51 @@
+<div class="dashboard-container">
+  <header class="dashboard-header">
+    <div class="welcome-message">
+      <h1>Bienvenido, {{ userName() }}</h1>
+      <p>Aquí tienes un resumen de tu trabajo pendiente.</p>
+    </div>
+    <button (click)="logout()" class="logout-btn">Cerrar Sesión</button>
+  </header>
+
+  <main class="dashboard-content">
+    @if (loading()) {
+      <div class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Cargando tus órdenes...</p>
+      </div>
+    } @else if (error()) {
+      <div class="error-state">
+        <h3>¡Ups! Algo salió mal</h3>
+        <p>{{ error() }}</p>
+        <button (click)="loadOrdenes()" class="primary-btn">Reintentar</button>
+      </div>
+    } @else {
+      <div class="ordenes-grid">
+        @for (orden of ordenes(); track orden.id) {
+          <div class="orden-card" [class]="orden.estado">
+            <div class="card-header">
+              <span class="orden-id">ORDEN #{{ orden.id }}</span>
+              <span class="status-badge" [class]="orden.estado">{{ orden.estado.replace('_', ' ') }}</span>
+            </div>
+            <div class="card-body">
+              <h3 class="vehiculo-info">
+                {{ orden.vehiculo?.marca }} {{ orden.vehiculo?.modelo }}
+                <span class="vehiculo-placa">{{ orden.vehiculo?.placa }}</span>
+              </h3>
+              <p class="orden-titulo">{{ orden.titulo }}</p>
+            </div>
+            <div class="card-footer">
+              <a class="details-btn">Ver Detalles</a>
+            </div>
+          </div>
+        } @empty {
+          <div class="empty-state">
+            <svg class="empty-icon" xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            <h3>¡Excelente trabajo!</h3>
+            <p>No tienes órdenes de servicio pendientes por el momento.</p>
+          </div>
+        }
+      </div>
+    }
+  </main>
+</div>

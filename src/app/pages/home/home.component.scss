@@ -1,8 +1,181 @@
-.services-list {
-  list-style: none;
+/* Importa una fuente de Google Fonts para un look más moderno */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+
+:host {
+  display: block;
+  font-family: 'Roboto', sans-serif;
+  color: #333;
 }
 
-.services-list li {
-  font-size: 18px;
+.section {
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.gray {
+  background-color: #f8f9fa;
+}
+
+h1, h2, h3 {
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+h2 {
+  font-size: 2.5rem;
+  color: #343a40;
+  position: relative;
+  display: inline-block;
+  padding-bottom: 10px;
+  margin-bottom: 40px;
+}
+
+h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 4px;
+  background-color: #e74c3c;
+}
+
+p {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #6c757d;
+}
+
+.hero { 
+  display: flex; 
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  color: #fff;
+  text-align: center;
+  position: relative;
+  background-image: url('/assets/images/taller.jpg');
+  background-size: cover;
+  background-position: center center;
+  background-attachment: fixed; 
+  background-color: #212529;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 1;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+}
+
+.hero h1 {
+  font-size: 4rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.hero p {
+  font-size: 1.5rem;
+  font-weight: 300;
+  margin-bottom: 30px;
+  color: #f8f9fa;
+}
+
+.cta-button {
+  display: inline-block;
+  padding: 15px 30px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #fff;
+  background-color: #e74c3c;
+  border: none;
+  border-radius: 50px;
+  text-decoration: none;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.cta-button:hover {
+  background-color: #c0392b;
+  transform: translateY(-3px);
+}
+
+.service-grid, .reasons-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px;
+  text-align: left;
+}
+
+.service-card, .reason-card {
+  background: #fff;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.service-card:hover, .reason-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+}
+
+.service-card h3 {
+  font-size: 1.5rem;
+  color: #e74c3c;
+}
+
+.reason-card .reason-icon {
+  font-size: 2.5rem;
+  color: #e74c3c;
+  margin-bottom: 15px;
+}
+
+.reason-card h3 {
+  font-size: 1.4rem;
   margin-bottom: 10px;
+}
+
+.footer {
+  background-color: #1c1d21; /* Un negro elegante */
+  color: rgba(255, 255, 255, 0.7);
+  padding: 50px 20px;
+  text-align: center;
+}
+
+.footer-content h3 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 15px;
+}
+
+.footer-content p {
+  margin: 0 0 15px;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.7;
+}
+
+.footer-bottom {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #333;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.5);
 }

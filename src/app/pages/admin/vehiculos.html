@@ -1,0 +1,78 @@
+<div class="container-fluid p-4">
+  <header class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3">Gestión de Vehículos</h1>
+    <!-- Botón para crear nuevos vehículos en el futuro -->
+  </header>
+
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <h5 class="card-title mb-3">Filtro de Búsqueda</h5>
+      <div class="row g-3 align-items-end">
+        <div class="col-md-10">
+          <label for="filtroBusqueda" class="form-label">Buscar por Propietario, Marca, Modelo o Placa</label>
+          <input id="filtroBusqueda" type="text" class="form-control" placeholder="Escriba para buscar..." [value]="filtroBusqueda()" (input)="onFiltroChange($event)">
+        </div>
+        <div class="col-md-2">
+          <button class="btn btn-outline-secondary w-100" (click)="clearFilter()">Limpiar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="d-flex justify-content-center align-items-center" style="height: 200px;">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+  } @else if (error()) {
+    <div class="alert alert-danger" role="alert">
+      <strong>Error:</strong> {{ error() }}
+    </div>
+  } @else if (vehiculos().length > 0) {
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead class="table-light">
+              <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Propietario</th>
+                <th scope="col">Marca</th>
+                <th scope="col">Modelo</th>
+                <th scope="col">Año</th>
+                <th scope="col">Placa</th>
+                <th scope="col">Mecánico Asignado</th>
+                <th scope="col" class="text-end">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (vehiculo of vehiculos(); track vehiculo.id) {
+                <tr>
+                  <td>{{ vehiculo.id }}</td>
+                  <td>{{ vehiculo.cliente?.usuario?.nombre || 'N/A' }}</td>
+                  <td>{{ vehiculo.marca }}</td>
+                  <td>{{ vehiculo.modelo }}</td>
+                  <td>{{ vehiculo.anio }}</td>
+                  <td>{{ vehiculo.placa }}</td>
+                  <td>{{ getMecanicoNombre(vehiculo) }}</td>
+                  <td class="text-end">
+                    <div class="btn-group" role="group" aria-label="Acciones de vehículo">
+                      <button type="button" class="btn btn-sm btn-outline-danger" (click)="deleteVehiculo(vehiculo.id)">
+                        Eliminar
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div class="alert alert-info" role="alert">
+      No se encontraron vehículos registrados con los filtros actuales.
+    </div>
+  }
+</div>
