@@ -1,5 +1,5 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://127.0.0.1:8000/api',
-  imageStorageUrl: 'http://127.0.0.1:8000/storage' // Asumiendo que tu backend local también sirve las imágenes desde /storage
+  apiUrl: 'https://taller-backend-final-production.up.railway.app/api',
+  imageStorageUrl: 'https://taller-backend-final-production.up.railway.app/storage' // Asumiendo que tu backend local también sirve las imágenes desde /storage
 };
