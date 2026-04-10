@@ -1,39 +1,56 @@
 <section class="auth-section">
-  <h2>Iniciar sesión</h2>
-
-  <form class="auth-form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-    <div class="form-field">
-      <input type="email" placeholder="Correo electrónico" formControlName="correo" [class.invalid]="correo?.invalid && correo?.touched">
-      @if (correo?.hasError('required') && correo?.touched) {
-        <div class="form-field-error">El correo es obligatorio.</div>
-      }
-      @if (correo?.hasError('email') && correo?.touched) {
-        <div class="form-field-error">El formato del correo no es válido (debe incluir @).</div>
-      }
-    </div>
-    <div class="form-field password-field">
-      <input [type]="passwordVisible() ? 'text' : 'password'" placeholder="Contraseña" formControlName="password" [class.invalid]="password?.invalid && password?.touched">
-      <button type="button" class="password-toggle-btn" (click)="togglePasswordVisibility()" aria-label="Mostrar u ocultar contraseña">
-        @if (passwordVisible()) {
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+  <div class="auth-overlay"></div>
+  <div class="login-card">
+    <h2 class="auth-title">Bienvenido</h2>
+    <p class="subtitle">Ingresa tus credenciales para continuar</p>
+    
+    <form class="auth-form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="form-field">
+        <label for="email">Correo electrónico</label>
+        <input type="email" id="email" placeholder="ejemplo@correo.com" formControlName="correo" [class.invalid]="correo?.invalid && correo?.touched" autocomplete="email">
+        @if (correo?.hasError('required') && correo?.touched) {
+          <div class="form-field-error">El correo es obligatorio.</div>
+        }
+        @if (correo?.hasError('email') && correo?.touched) {
+          <div class="form-field-error">El formato del correo no es válido (debe incluir @).</div>
+        }
+      </div>
+      <div class="form-field password-field">
+        <label for="password">Contraseña</label>
+        <input [type]="passwordVisible() ? 'text' : 'password'" id="password" placeholder="Contraseña" formControlName="password" [class.invalid]="password?.invalid && password?.touched" autocomplete="current-password">
+        <button type="button" class="password-toggle-btn" (click)="togglePasswordVisibility()" aria-label="Mostrar u ocultar contraseña">
+          @if (passwordVisible()) {
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+          } @else {
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+          }
+        </button>
+        @if (password?.hasError('minlength') && password?.touched) {
+          <div class="form-field-error">La contraseña debe tener al menos 7 caracteres.</div>
+        }
+      </div>
+      <button type="submit" class="primary-btn" [disabled]="loginForm.invalid || isLoading()" aria-label="Ingresar">
+        @if (isLoading()) {
+          <span class="spinner"></span>
+          Verificando...
         } @else {
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+          Ingresar
         }
       </button>
-      @if (password?.hasError('minlength') && password?.touched) {
-        <div class="form-field-error">La contraseña debe tener al menos 7 caracteres.</div>
-      }
+    </form>
+
+    @if (errorMessage()) { 
+      <div class="error-message">{{ errorMessage() }}</div>
+    }
+
+    <div class="auth-footer">
+      <!-- <a routerLink="/recuperar" class="link-btn">
+        ¿Olvidaste tu contraseña?
+      </a> -->
+      <div class="divider"></div>
+      <a routerLink="/" class="link-secondary">
+        Volver al inicio
+      </a>
     </div>
-    <button type="submit" class="primary-btn" [disabled]="loginForm.invalid">Ingresar</button>
-  </form>
-
-  <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
-
-  <a routerLink="/recuperar" class="link-btn">
-    ¿Olvidaste tu contraseña?
-  </a>
-
-  <a routerLink="/" class="link-btn">
-    Volver al inicio
-  </a>
+  </div>
 </section>

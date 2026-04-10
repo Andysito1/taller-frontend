@@ -117,7 +117,7 @@
                 <th scope="col">Modelo</th>
                 <th scope="col">Año</th>
                 <th scope="col">Placa</th>
-                <th scope="col">Foto</th>
+                <!-- <th scope="col">Foto</th> -->
                 <th scope="col" class="text-end">Acciones</th>
               </tr>
             </thead>
@@ -130,7 +130,7 @@
                   <td>{{ vehiculo.modelo }}</td>
                   <td>{{ vehiculo.anio }}</td>
                   <td>{{ vehiculo.placa }}</td>
-                  <td>
+                  <!-- <td>
                     @if (vehiculo.imagen) {
                       <img [src]="getImageUrl(vehiculo.imagen)" [alt]="vehiculo.placa" class="rounded shadow-sm" style="width: 45px; height: 45px; object-fit: cover;">
                     } @else {
@@ -138,7 +138,7 @@
                         <i class="bi bi-camera"></i>
                       </div>
                     }
-                  </td>
+                  </td> -->
                   <td class="text-end">
                     <div class="btn-group" role="group">
                       <button type="button" class="btn btn-sm btn-outline-primary" (click)="editVehiculo(vehiculo)">

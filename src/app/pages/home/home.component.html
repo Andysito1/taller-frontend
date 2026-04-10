@@ -1,38 +1,54 @@
-<section id="inicio" class="section hero">
-  <div class="hero-content">
+<section id="inicio" class="hero">
+  <div class="hero-overlay"></div>
+
+  <div class="hero-content container">
+    <span class="badge">Sistema Automotriz Profesional</span>
     <h1>Xtreme Performance</h1>
-    <p>Potencia, precisión y confianza para tu vehículo.</p>
-    <a href="#servicios" class="cta-button">Ver Servicios</a>
+    <p>Gestión inteligente y servicios de alto rendimiento para tu vehículo.</p>
+
+    <div class="hero-actions">
+      <a href="#servicios" class="btn primary">Ver Servicios</a>
+      <a href="#contacto" class="btn secondary">Contactar</a>
+    </div>
   </div>
 </section>
 
 <section id="quienes" class="section">
-  <div class="container">
+  <div class="container narrow">
     <h2>Quiénes Somos</h2>
-    <p>Somos un equipo de profesionales apasionados por la mecánica automotriz, dedicados a ofrecer soluciones de alta calidad para todo tipo de vehículos. Nuestra misión es garantizar el máximo rendimiento y seguridad en cada auto que pasa por nuestro taller.</p>
+    <p>
+      En Xtreme Performance combinamos experiencia técnica con tecnología para ofrecer
+      un servicio automotriz moderno, eficiente y transparente. Nuestro sistema permite
+      gestionar cada proceso del vehículo con precisión y seguimiento en tiempo real.
+    </p>
   </div>
 </section>
 
-<section id="servicios" class="section gray">
-  <div class="container">
+<section id="servicios" class="section gray" style="padding-bottom: 0;">
+  <div class="container" style="padding-bottom: 40px;">
     <h2>Nuestros Servicios</h2>
-    <div class="service-grid">
-      <div class="service-card">
-        <h3>Diagnóstico Vehicular</h3>
-        <p>Utilizamos tecnología de punta para identificar con precisión cualquier problema en tu vehículo.</p>
-      </div>
-      <div class="service-card">
-        <h3>Mantenimiento Preventivo</h3>
-        <p>Asegura la longevidad y el buen funcionamiento de tu auto con nuestros planes de mantenimiento.</p>
-      </div>
-      <div class="service-card">
-        <h3>Reparaciones Generales</h3>
-        <p>Desde el motor hasta los frenos, nuestro equipo experto se encarga de todo tipo de reparaciones.</p>
-      </div>
-      <div class="service-card">
-        <h3>Pruebas de Rendimiento</h3>
-        <p>Optimizamos y probamos tu vehículo para que alcance su máximo potencial en la pista y la calle.</p>
-      </div>
+    <p style="opacity: 0.7;">Haz clic en las flechas para explorar nuestras especialidades</p>
+  </div>
+
+  <div class="services-slider">
+    <!-- Flechas de navegación -->
+    <button class="slider-arrow left" (click)="prev()" aria-label="Ver servicio anterior">❮</button>
+    <button class="slider-arrow right" (click)="next()" aria-label="Ver siguiente servicio">❯</button>
+
+    <div class="service-track" [style.transform]="'translateX(-' + currentIndex() * 100 + '%)'">
+      @for (service of services(); track $index) {
+        <div class="service-item">
+          <div class="service-bg">
+            <!-- Uso de NgOptimizedImage para asegurar que carguen correctamente -->
+            <img [ngSrc]="service.img" fill priority alt="{{ service.title }}" style="object-fit: cover;">
+          </div>
+          <div class="service-info">
+            <span class="service-number">0{{ $index + 1 }}</span>
+            <h3>{{ service.title }}</h3>
+            <p>{{ service.desc }}</p>
+          </div>
+        </div>
+      }
     </div>
   </div>
 </section>
@@ -40,26 +56,26 @@
 <section id="porque" class="section">
   <div class="container">
     <h2>¿Por qué elegirnos?</h2>
+
     <div class="reasons-grid">
       <div class="reason-card">
-        <div class="reason-icon">✔</div>
-        <h3>Técnicos Especializados</h3>
-        <p>Nuestro personal está altamente calificado y en constante capacitación.</p>
+        <h3>Tecnología en Tiempo Real</h3>
+        <p>Seguimiento del servicio desde cualquier dispositivo.</p>
       </div>
+
       <div class="reason-card">
-        <div class="reason-icon">✔</div>
-        <h3>Equipos Modernos</h3>
-        <p>Contamos con las herramientas más avanzadas para un servicio eficiente y preciso.</p>
+        <h3>Gestión Digital</h3>
+        <p>Órdenes, clientes y vehículos centralizados en un sistema web.</p>
       </div>
+
       <div class="reason-card">
-        <div class="reason-icon">✔</div>
-        <h3>Transparencia Total</h3>
-        <p>Te mantenemos informado durante todo el proceso, sin costos ocultos.</p>
+        <h3>Precisión Técnica</h3>
+        <p>Procesos optimizados con estándares profesionales.</p>
       </div>
+
       <div class="reason-card">
-        <div class="reason-icon">✔</div>
-        <h3>Seguimiento del Servicio</h3>
-        <p>Podrás ver el estado de tu servicio en tiempo real a través de nuestra plataforma.</p>
+        <h3>Transparencia</h3>
+        <p>Control total del servicio sin costos ocultos.</p>
       </div>
     </div>
   </div>
@@ -67,13 +83,9 @@
 
 <footer id="contacto" class="footer">
   <div class="container">
-    <div class="footer-content">
-      <h3>Xtreme Performance</h3>
-      <p>Jr. Nemesio Raez 2241, El Tambo, Huancayo, Perú</p>
-      <p><strong>Facebook:</strong> Xtreme Performance EIRL | <strong>Teléfono:</strong> +51 998 980 547</p>
-    </div>
-    <div class="footer-bottom">
-      <p>&copy; 2026 Xtreme Performance. Todos los derechos reservados.</p>
-    </div>
+    <h3>Xtreme Performance</h3>
+    <p>Jr. Nemesio Raez 2241, El Tambo, Huancayo</p>
+    <p>+51 998 980 547</p>
+    <span class="copy">© 2026 Todos los derechos reservados</span>
   </div>
 </footer>

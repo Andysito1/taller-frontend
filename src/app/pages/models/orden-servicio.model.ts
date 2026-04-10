@@ -1,5 +1,6 @@
 import { Mecanico } from './mecanico.model';
 import { Vehiculo } from './vehiculo.model';
+import { FinanzaServicio } from './finanza-servicio.model';
 
 export interface OrdenServicio {
   id: number;
@@ -17,4 +18,5 @@ export interface OrdenServicio {
     etapa: 'diagnostico' | 'reparacion' | 'pruebas' | 'finalizacion';
     estado: 'pendiente' | 'en_proceso' | 'completado';
   }>;
+  finanzas?: FinanzaServicio[];
 }

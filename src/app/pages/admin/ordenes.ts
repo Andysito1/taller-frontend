@@ -5,14 +5,18 @@ import {
   computed,
   inject,
   signal,
+  effect,
 } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { AdminService } from '../../services/admin.service';
+import { PushNotificationService } from '../../services/push-notification.service';
 import { OrdenServicio } from '../models/orden-servicio.model';
 import { Mecanico } from '../models/mecanico.model';
 import { Vehiculo } from '../models/vehiculo.model';
+import { FinanzaServicio } from '../models/finanza-servicio.model';
 
 @Component({
   selector: 'app-ordenes',
@@ -24,6 +28,31 @@ import { Vehiculo } from '../models/vehiculo.model';
 export class Ordenes implements OnInit {
   private adminService = inject(AdminService);
   private fb = inject(FormBuilder);
+  private pushService = inject(PushNotificationService);
+
+  constructor() {
+    // EFECTO PARA ACTUALIZACIÓN EN VIVO
+    // Se dispara cada vez que el PushNotificationService detecta un cambio en una orden
+    effect(() => {
+      const updatedOrderId = this.pushService.pendingOrdenId();
+      
+      if (updatedOrderId) {
+        console.log(`Actualización en vivo detectada para la orden #${updatedOrderId}`);
+        
+        // Recargamos la lista completa silenciosamente
+        this.loadOrdenes();
+
+        // Si el admin tiene abierto el detalle de la orden que cambió, actualizamos el modal
+        const currentDetail = this.selectedOrden();
+        if (currentDetail && currentDetail.id === updatedOrderId) {
+          this.refrescarOrdenSeleccionada(updatedOrderId);
+        }
+
+        // Limpiamos la señal para estar listos para la próxima actualización
+        this.pushService.pendingOrdenId.set(null);
+      }
+    });
+  }
 
   // State
   private allOrdenes = signal<OrdenServicio[]>([]);
@@ -46,7 +75,10 @@ export class Ordenes implements OnInit {
     titulo: ['', [Validators.required, Validators.maxLength(100)]],
     descripcion: ['', Validators.required],
     fecha_inicio: ['', [Validators.required, this.minDateTodayValidator()]],
-    fecha_fin: ['', [Validators.required, this.maxDateTwoMonthsValidator()]]
+    fecha_fin: ['', [Validators.required, this.maxDateTwoMonthsValidator()]],
+    concepto_finanza: ['', [Validators.maxLength(100)]],
+    tipo_finanza: ['base'], 
+    monto_finanza: [0]
   });
 
   // Mantenemos esto para validaciones si fuera necesario, pero usaremos allVehiculos en el HTML
@@ -107,6 +139,11 @@ export class Ordenes implements OnInit {
     this.loadVehiculos();
   }
 
+  public totalPrecios(orden: OrdenServicio): number {
+    const finanzas = orden.finanzas || [];
+    return finanzas.reduce((sum: number, finanza: FinanzaServicio) => sum + (finanza.monto || 0), 0);
+  }
+
   loadOrdenes(): void {
     this.loading.set(true);
     this.error.set(null);
@@ -122,6 +159,18 @@ export class Ordenes implements OnInit {
         );
         this.loading.set(false);
       },
+    });
+  }
+
+  /**
+   * Actualiza los datos de una orden específica en el detalle sin cerrar el modal
+   */
+  private refrescarOrdenSeleccionada(id: number): void {
+    this.adminService.getOrdenes().subscribe(ordenes => {
+      const actualizada = ordenes.find(o => o.id === id);
+      if (actualizada) {
+        this.selectedOrden.set(actualizada);
+      }
     });
   }
 
@@ -184,13 +233,14 @@ export class Ordenes implements OnInit {
         this.ordenForm.reset();
         this.showForm.set(false);
         Swal.fire({
-          title: "¡Orden agregada con éxito!",
+          title: "¡Orden registrada!",
+          text: "La orden de servicio y su detalle financiero inicial han sido guardados.",
           icon: "success",
-          draggable: true
+          confirmButtonColor: '#0d6efd'
         });
         this.loadOrdenes();
       },
-      error: (err) => {
+      error: (err: HttpErrorResponse) => {
         console.error('Error al crear orden:', err);
         this.loading.set(false);
         

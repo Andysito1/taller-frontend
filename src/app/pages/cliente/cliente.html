@@ -41,7 +41,7 @@
       } @else {
         <div class="vehicles-grid">
           @for (vehiculo of vehiculos(); track vehiculo.id) {
-            <div class="vehicle-card" [class.selected]="selectedVehiculo()?.id === vehiculo.id" (click)="selectVehiculo(vehiculo)">
+            <div class="vehicle-card">
               <div class="card-info">
                 <h3>{{ vehiculo.marca }} {{ vehiculo.modelo }}</h3>
                 <span class="plate">{{ vehiculo.placa }}</span>
@@ -104,7 +104,7 @@
               <p>{{ servicio.descripcion }}</p>
               <div class="price-tag">Desde {{ servicio.precio }}</div>
             </div>
-            <button class="action-btn">Consultar</button>
+            <!-- <button class="action-btn">Consultar</button> -->
           </div>
         }
       </div>
