@@ -10,12 +10,13 @@ export class ReportService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrl}/reportes`;
 
-  downloadClientServiceReport(filters: any): Observable<Blob> {
+  downloadClientServiceReport(filters: unknown): Observable<Blob> {
     let params = new HttpParams();
     
-    Object.keys(filters).forEach(key => {
-      if (filters[key]) {
-        params = params.append(key, filters[key]);
+    const f = filters as Record<string, any>;
+    Object.keys(f).forEach(key => {
+      if (f[key] !== null && f[key] !== undefined && f[key] !== '') {
+        params = params.append(key, f[key]);
       }
     });
 
