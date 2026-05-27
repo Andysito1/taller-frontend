@@ -22,6 +22,10 @@ export const ADMIN_ROUTES: Routes = [
     loadComponent: () => import('./ordenes').then((m) => m.Ordenes),
   },
   {
+    path: 'reportes',
+    loadComponent: () => import('./reportes').then((m) => m.Reportes),
+  },
+  {
     path: '',
     redirectTo: 'clientes',
     pathMatch: 'full',
