@@ -1,15 +1,16 @@
 <div class="container-fluid p-4">
-  <header class="d-flex justify-content-between align-items-center mb-4">
+  <div class="header d-flex justify-content-between align-items-center">
     <div>
-      <h1 class="h3 mb-0">Gestión de Órdenes de Servicio</h1>
+      <h2>📋 Gestión de Órdenes de Servicio</h2>
+      <p>Control y seguimiento detallado de las reparaciones y mantenimientos en curso.</p>
       <span class="badge bg-success-subtle text-success border border-success-subtle small shadow-sm animate-pulse">
-        <!-- <i class="bi bi-broadcast"></i> Actualización en vivo -->
+        <i class="bi bi-broadcast"></i> Actualización en vivo
       </span>
     </div>
     <button class="btn btn-primary" (click)="toggleForm()">
       {{ showForm() ? 'Cancelar' : 'Nueva Orden' }}
     </button>
-  </header>
+  </div>
 
   @if (showForm()) {
     <div class="modal-backdrop fade show"></div>
