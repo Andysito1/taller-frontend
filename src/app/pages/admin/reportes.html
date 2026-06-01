@@ -1,117 +1,79 @@
-<div class="reports-container p-4 md:p-8" aria-labelledby="main-title">
-  <header class="mb-10 text-center md:text-left">
-    <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-3 mb-2">
-      <div class="p-3 bg-primary-subtle rounded-3 text-primary">
-        <i class="bi bi-graph-up-arrow fs-2"></i>
-      </div>
-      <div>
-        <h1 id="main-title" class="text-3xl font-extrabold text-slate-900 mb-0">Reportes Estratégicos</h1>
-        <p class="text-slate-500">Módulo de auditoría y análisis de operaciones del taller.</p>
-      </div>
-    </div>
-  </header>
+<div class="reports-container">
+  <div class="header">
+    <h2>📊 Centro de Reportes</h2>
+    <p>Configura los filtros para generar informes detallados de clientes y servicios en formato Excel.</p>
+  </div>
 
-  <div class="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden max-w-4xl mx-auto">
-    <div class="bg-gradient-to-r from-primary to-blue-600 h-2"></div>
-    
-    <form [formGroup]="reportForm" (ngSubmit)="descargarExcel()" class="p-6 md:p-10 space-y-8">
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <!-- Configuración Principal -->
-        <div class="space-y-6">
-          <div class="space-y-2">
-            <label for="tipo_filtro" class="block text-sm font-bold text-slate-700 uppercase tracking-wider">
-              <i class="bi bi-funnel me-1"></i> Tipo de Periodicidad
-            </label>
-            <select id="tipo_filtro" formControlName="tipo_filtro" 
-                    class="w-full bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl focus:ring-primary focus:border-primary block p-3.5 transition-all shadow-sm"
-                    aria-required="true">
-              <option value="anio">Balance Anual</option>
-              <option value="mes_especifico">Detalle Mensual</option>
-              <option value="rango">Rango de Fechas</option>
-            </select>
-          </div>
-
-          <div class="space-y-2">
-            <label for="tipo_cliente" class="block text-sm font-bold text-slate-700 uppercase tracking-wider">
-              <i class="bi bi-person-badge me-1"></i> Segmento de Cliente
-            </label>
-            <select id="tipo_cliente" formControlName="tipo_cliente"
-                    class="w-full bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl focus:ring-primary focus:border-primary block p-3.5 shadow-sm">
-              <option value="">Todos los Clientes</option>
-              <option value="natural">Personas Naturales</option>
-              <option value="juridico">Empresas (Jurídico)</option>
-            </select>
-          </div>
+  <div class="report-card">
+    <form [formGroup]="reportForm" (ngSubmit)="descargarExcel()">
+      <div class="form-grid">
+        <!-- Tipo de Filtro -->
+        <div class="form-group">
+          <label for="tipo_filtro">Periodicidad del Reporte</label>
+          <select id="tipo_filtro" formControlName="tipo_filtro" class="form-control">
+            <option value="anio">Reporte Anual</option>
+            <option value="mes_especifico">Reporte Mensual</option>
+            <option value="rango">Rango Personalizado</option>
+          </select>
         </div>
 
-        <!-- Filtros Dinámicos -->
-        <div class="bg-slate-50 p-6 rounded-2xl border border-dashed border-slate-300">
-          <h3 class="text-xs font-bold text-slate-400 uppercase mb-4 tracking-widest">Parámetros del Tiempo</h3>
-          
-          <div class="space-y-4">
-            @if (filtroActivo() === 'anio' || filtroActivo() === 'mes_especifico') {
-              <div class="space-y-2">
-                <label for="anio" class="text-sm font-semibold text-slate-600">Año del Ejercicio</label>
-                <input type="number" id="anio" formControlName="anio" 
-                       class="w-full bg-white border border-slate-200 rounded-lg p-3 focus:ring-2 focus:ring-primary/20 outline-none"
-                       placeholder="Ej. 2024">
-              </div>
-            }
-
-            @if (filtroActivo() === 'mes_especifico') {
-              <div class="space-y-2">
-                <label for="mes" class="text-sm font-semibold text-slate-600">Mes a Reportar</label>
-                <select id="mes" formControlName="mes" class="w-full bg-white border border-slate-200 rounded-lg p-3 outline-none">
-                  @for (m of meses; track m.id) {
-                    <option [value]="m.id">{{ m.nombre }}</option>
-                  }
-                </select>
-              </div>
-            }
-
-            @if (filtroActivo() === 'rango') {
-              <div class="space-y-4">
-                <div class="space-y-2">
-                  <label for="fecha_inicio" class="text-sm font-semibold text-slate-600">Desde</label>
-                  <input type="date" id="fecha_inicio" formControlName="fecha_inicio" 
-                         class="w-full border border-slate-200 rounded-lg p-3 outline-none">
-                </div>
-                <div class="space-y-2">
-                  <label for="fecha_fin" class="text-sm font-semibold text-slate-600">Hasta</label>
-                  <input type="date" id="fecha_fin" formControlName="fecha_fin" 
-                         class="w-full border border-slate-200 rounded-lg p-3 outline-none">
-                </div>
-              </div>
-            }
-          </div>
+        <!-- Filtro por Cliente -->
+        <div class="form-group">
+          <label for="tipo_cliente">Filtrar por Cliente</label>
+          <select id="tipo_cliente" formControlName="tipo_cliente" class="form-control">
+            <option value="">Todos los registros</option>
+            <option value="persona">Personas Naturales</option>
+            <option value="empresa">Empresas (Jurídicos)</option>
+          </select>
         </div>
+
+        <!-- Controles dinámicos según el tipo de filtro -->
+        @if (filtroActivo() === 'anio' || filtroActivo() === 'mes_especifico') {
+          <div class="form-group">
+            <label for="anio">Año Fiscal</label>
+            <input type="number" id="anio" formControlName="anio" class="form-control" placeholder="Ej: 2024">
+          </div>
+        }
+
+        @if (filtroActivo() === 'mes_especifico') {
+          <div class="form-group">
+            <label for="mes">Mes de Consulta</label>
+            <select id="mes" formControlName="mes" class="form-control">
+              @for (mes of meses; track mes.id) {
+                <option [value]="mes.id">{{ mes.nombre }}</option>
+              }
+            </select>
+          </div>
+        }
+
+        @if (filtroActivo() === 'rango') {
+          <div class="form-group">
+            <label for="fecha_inicio">Fecha Inicial</label>
+            <input type="date" id="fecha_inicio" formControlName="fecha_inicio" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="fecha_fin">Fecha Final</label>
+            <input type="date" id="fecha_fin" formControlName="fecha_fin" class="form-control">
+          </div>
+        }
       </div>
-      
+
+      <!-- Alerta de validación de fechas -->
       @if (reportForm.hasError('rangoInvalido')) {
-        <div class="alert alert-danger rounded-xl border-0 shadow-sm d-flex align-items-center gap-2" role="alert">
-          <i class="bi bi-exclamation-octagon-fill"></i>
-          <span>La fecha de término debe ser posterior a la de inicio.</span>
+        <div class="alert-error" style="color: #dc2626; background: #fee2e2; padding: 0.75rem; border-radius: 8px; margin-bottom: 1.5rem; font-size: 0.875rem; border: 1px solid #fecaca;">
+          <strong>Error:</strong> La fecha de inicio no puede ser posterior a la fecha final.
         </div>
       }
 
-      <div class="pt-8 border-t border-slate-100 flex flex-col items-center gap-4">
-        <button type="submit" 
-                [disabled]="reportForm.invalid || cargando()"
-                class="group relative w-full md:w-80 bg-slate-900 hover:bg-black text-white font-bold py-4 px-8 rounded-2xl shadow-xl transition-all duration-300 transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0">
-          <span class="flex items-center justify-center gap-2 text-lg">
-            @if (cargando()) {
-              <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
-              <span>Generando...</span>
-            } @else {
-              <i class="bi bi-file-earmark-excel"></i>
-              <span>Obtener Reporte</span>
-            }
-          </span>
+      <div class="action-section">
+        <button type="submit" class="btn-download" [disabled]="reportForm.invalid || cargando()">
+          @if (cargando()) {
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Generando archivo...
+          } @else {
+            <span>📥 Descargar Reporte (.xlsx)</span>
+          }
         </button>
-        <p class="text-xs text-slate-400 text-center max-w-sm">
-          * El archivo se generará automáticamente con formato .xlsx optimizado para lectura y filtros de Excel.
-        </p>
       </div>
     </form>
   </div>

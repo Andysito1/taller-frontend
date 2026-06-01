@@ -1,0 +1,107 @@
+.reports-container {
+  max-width: 1000px;
+  margin: 0 auto;
+
+  .header {
+    margin-bottom: 2rem;
+    h2 {
+      color: #1e293b;
+      font-size: 1.875rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    p {
+      color: #64748b;
+      font-size: 1rem;
+    }
+  }
+
+  .report-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    border: 1px solid #e2e8f0;
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+
+      label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #334155;
+      }
+
+      .form-control {
+        padding: 0.75rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        background-color: #fff;
+        color: #1e293b;
+
+        &:focus {
+          outline: none;
+          border-color: #2563eb;
+          box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        &:disabled {
+          background-color: #f8fafc;
+          color: #94a3b8;
+          cursor: not-allowed;
+        }
+      }
+    }
+
+    .action-section {
+      border-top: 1px solid #f1f5f9;
+      padding-top: 2rem;
+      display: flex;
+      justify-content: flex-end;
+
+      .btn-download {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        background-color: #10b981;
+        color: white;
+        padding: 0.875rem 2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
+
+        &:hover:not(:disabled) {
+          background-color: #059669;
+          transform: translateY(-1px);
+          box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3);
+        }
+
+        &:active:not(:disabled) {
+          transform: translateY(0);
+        }
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+}

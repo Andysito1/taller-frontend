@@ -16,9 +16,7 @@ import { HttpErrorResponse, HttpClient } from '@angular/common/http';
   selector: 'app-reportes',
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './reportes.html',
-  styles: [`
-    :host { display: block; min-height: 100vh; background-color: #f8fafc; }
-  `],
+  styleUrl: './reportes.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Reportes implements OnInit {
