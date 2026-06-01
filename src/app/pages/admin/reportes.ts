@@ -10,7 +10,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors, FormArray, FormControl } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { ReportService } from '../../services/report.service';
-import { HttpErrorResponse, HttpClient } from '@angular/common/http';
+import { HttpErrorResponse, HttpClient, HttpResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-reportes',
@@ -108,45 +108,67 @@ export class Reportes implements OnInit {
     });
 
     this.reportService.downloadClientServiceReport(payload).subscribe({
-      next: (blob) => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `reporte_clientes_servicios_${new Date().toISOString().split('T')[0]}.xlsx`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-        
-        this.cargando.set(false);
-        Swal.fire('¡Completado!', 'Tu reporte se ha descargado exitosamente.', 'success');
-      },
-      error: async (err: HttpErrorResponse) => {
-        this.cargando.set(false);
-        
-        let errorMessage = 'Hubo un problema interno en el servidor al procesar el Excel.';
+      next: (response: any) => this.procesarDescargaExitosa(response),
+      error: (err: HttpErrorResponse) => this.procesarErrorDescarga(err)
+    });
+  }
 
-        // Mapeo inteligente del error cuando la respuesta es un Blob JSON (típico en errores 500)
-        if (err.error instanceof Blob && err.error.type === 'application/json') {
-          try {
-            const text = await err.error.text();
-            const parsedError = JSON.parse(text);
-            errorMessage = parsedError.message || errorMessage;
-            
-            // Log detallado para desarrollo
-            console.error('Error detallado del Backend:', parsedError);
-          } catch (e) {
-            console.error('No se pudo parsear el JSON de error binario');
-          }
+  private procesarDescargaExitosa(response: any): void {
+    // Detectamos si la respuesta es el objeto completo o solo el blob
+    const blob = response instanceof HttpResponse ? response.body : response;
+
+    if (!blob) {
+      this.cargando.set(false);
+      Swal.fire('Error', 'El servidor respondió con un archivo vacío.', 'error');
+      return;
+    }
+
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `reporte_${Date.now()}.xlsx`;
+    document.body.appendChild(a);
+    a.click();
+    
+    // Limpieza
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+    this.cargando.set(false);
+    Swal.fire('¡Completado!', 'Reporte descargado.', 'success');
+  }
+
+  private procesarErrorDescarga(err: HttpErrorResponse): void {
+    this.cargando.set(false);
+    
+    if (err.status === 404) {
+      Swal.fire('Sin registros', 'No hay datos para los filtros seleccionados.', 'info');
+      return;
+    }
+
+    let errorMessage = 'Error al generar el Excel.';
+
+    // Si el error viene como un Blob (porque responseType era 'blob')
+    if (err.error instanceof Blob && err.error.type === 'application/json') {
+      err.error.text().then(text => {
+        try {
+          const parsed = JSON.parse(text);
+          this.mostrarNotificacionError(parsed.message || errorMessage);
+        } catch {
+          this.mostrarNotificacionError('Error desconocido en el servidor.');
         }
+      });
+      return;
+    }
 
-        Swal.fire({
-          icon: 'error',
-          title: 'Error en el Reporte',
-          text: errorMessage,
-          footer: '<small>Verifica si existen registros para los filtros seleccionados.</small>'
-        });
-      }
+    this.mostrarNotificacionError(errorMessage);
+  }
+
+  private mostrarNotificacionError(message: string): void {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: message,
+      footer: '<small>Revisa la consola para más detalles.</small>'
     });
   }
 }
