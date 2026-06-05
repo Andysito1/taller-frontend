@@ -5,6 +5,7 @@ WORKDIR /app
 # Copiar archivos de dependencias e instalarlos
 COPY package*.json ./
 RUN npm install
+RUN npm install -g @angular/cli
 
 # Copiar todo el código del proyecto y compilarlo para producción
 COPY . .
