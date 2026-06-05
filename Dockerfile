@@ -15,7 +15,7 @@ FROM nginx:alpine
 
 # Copiar los archivos compilados desde la etapa 'build' a la carpeta pública de Nginx
 # ¡Ojo aquí! Cambia 'nombre-de-tu-proyecto' por el nombre real de tu carpeta en Angular
-COPY --from=build /app/dist/nombre-de-tu-proyecto/browser /usr/share/nginx/html/
+COPY --from=build /app/dist/taller-frontend/browser /usr/share/nginx/html/
 
 # Exponer el puerto 80 que usa Nginx por defecto internamente
 EXPOSE 80
