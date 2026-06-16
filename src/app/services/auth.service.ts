@@ -32,6 +32,46 @@ export class AuthService {
     }
   }
 
+  // --- Métodos de Autenticación ---
+
+  login(credentials: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/login`, credentials).pipe(
+      tap(response => {
+        const token = response.token || response.access_token;
+        if (token) {
+          localStorage.setItem(this.tokenKey, token);
+          const user = response.user || response.data;
+          this.currentUser.set(user);
+          localStorage.setItem(this.userKey, JSON.stringify(user));
+        }
+      })
+    );
+  }
+
+  register(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/register`, data);
+  }
+
+  verifyRegistrationCode(email: string, code: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/verify-registration`, { email, code }).pipe(
+      tap((response: any) => {
+        if (response.token) {
+          this.handleAuthCallback(response.token).subscribe();
+        }
+      })
+    );
+  }
+
+  // --- Métodos de Recuperación de Contraseña ---
+
+  sendPasswordResetCode(email: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/forgot-password`, { email });
+  }
+
+  resetPassword(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/reset-password`, data);
+  }
+
   loginWithGoogle(): void {
     // Redirección directa al endpoint de Laravel Socialite
     window.location.href = `${this.apiUrl}/auth/google`;

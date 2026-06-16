@@ -37,6 +37,13 @@
           Ingresar
         }
       </button>
+      
+      <div class="divider-text">o continuar con</div>
+
+      <button type="button" class="google-btn" (click)="loginWithGoogle()" aria-label="Iniciar sesión con Google">
+        <img src="assets/icons/google.svg" alt="" aria-hidden="true" width="20" height="20">
+        Conectarse con Google
+      </button>
     </form>
 
     @if (errorMessage()) { 
@@ -44,9 +51,10 @@
     }
 
     <div class="auth-footer">
-      <!-- <a routerLink="/recuperar" class="link-btn">
+      <a routerLink="/auth/forgot-password" class="link-btn">
         ¿Olvidaste tu contraseña?
-      </a> -->
+      </a>
+      <p class="mt-2">¿No tienes cuenta? <a routerLink="/auth/register" class="link-secondary">Regístrate aquí</a></p>
       <div class="divider"></div>
       <a routerLink="/" class="link-secondary">
         Volver al inicio

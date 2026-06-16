@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, computed } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
@@ -21,7 +21,7 @@ export class LoginComponent {
     password: ['', [Validators.required, Validators.minLength(7)]]
   });
 
-  public errorMessage = signal<string>('');
+  public errorMessage = signal<string | null>(null);
   public passwordVisible = signal(false);
   public isLoading = signal(false);
 
@@ -36,7 +36,7 @@ export class LoginComponent {
   onSubmit(): void {
     if (this.loginForm.valid) {
       this.isLoading.set(true);
-      this.errorMessage.set('');
+      this.errorMessage.set(null);
       
       const formValue = this.loginForm.value;
       const credentials = {
@@ -81,6 +81,13 @@ export class LoginComponent {
         }
       });
     }
+  }
+
+  /**
+   * Inicia el flujo de Google OAuth redirigiendo al backend
+   */
+  loginWithGoogle(): void {
+    this.authService.loginWithGoogle();
   }
 
   togglePasswordVisibility(): void {
