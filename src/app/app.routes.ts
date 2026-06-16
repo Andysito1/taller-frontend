@@ -4,34 +4,34 @@ import { LoginComponent } from './pages/auth/login.component';
 import { Cliente } from './pages/cliente/cliente';
 import { Mecanico } from './pages/mecanico/mecanico';
 import { Admin } from './pages/admin/admin';
-import { authGuard, publicGuard, roleGuard } from './services/auth.guard';
+import { authGuard, PublicGuard, RoleGuard } from './services/auth.guard';
 //import { RecoverComponent } from './pages/auth/recover.component';
 
 export const routes: Routes = [
   {
     path: '',
     component: HomeComponent,
-    canActivate: [publicGuard]
+    canActivate: [PublicGuard]
   },
   {
     path: 'login',
     component: LoginComponent,
-    canActivate: [publicGuard]
+    canActivate: [PublicGuard]
   },
   {
     path: 'cliente',
     component: Cliente,
-    canActivate: [authGuard, roleGuard]
+    canActivate: [authGuard, RoleGuard]
   },
   {
     path: 'mecanico',
     component: Mecanico,
-    canActivate: [authGuard, roleGuard]
+    canActivate: [authGuard, RoleGuard]
   },
   {
     path: 'admin',
     component: Admin,
-    canActivate: [authGuard, roleGuard],
+    canActivate: [authGuard, RoleGuard],
     children: [
       {
         path: 'clientes',
