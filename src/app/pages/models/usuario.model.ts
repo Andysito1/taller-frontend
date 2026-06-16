@@ -1,16 +1,14 @@
-import { Role } from './role.model';
-import { TipoDocumento } from './tipo-documento.model';
+export interface Rol {
+  id: number;
+  nombre: string;
+}
 
 export interface Usuario {
   id: number;
   nombre: string;
   correo: string;
+  avatar?: string;
   id_rol: number;
-  id_tipo_documento: number | null;
+  rol: Rol;
   activo: boolean;
-  telefono: string | null;
-  direccion: string | null;
-  tipo_documento?: TipoDocumento | null;
-  numero_documento: string | null;
-  rol: Role;
 }

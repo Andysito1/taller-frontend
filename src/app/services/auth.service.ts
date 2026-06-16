@@ -1,10 +1,10 @@
-import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
+import { Injectable, PLATFORM_ID, signal, computed, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, Subject } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { environment } from '../../environment';
+import { Usuario } from '../pages/models/usuario.model';
 
 @Injectable({
   providedIn: 'root'
@@ -12,60 +12,39 @@ import { environment } from '../../environment';
 export class AuthService {
   private apiUrl = environment.apiUrl;
   private tokenKey = 'auth_token';
-  private roleKey = 'user_role';
-  private userNameKey = 'user_name';
-  private userIdKey = 'user_id';
+  private userKey = 'auth_user';
   
-  // Inicializar con null para evitar errores de acceso a 'this' antes del constructor
-  private roleSubject = new BehaviorSubject<string | null>(null);
-  private userNameSubject = new BehaviorSubject<string | null>(null);
-  private userIdSubject = new BehaviorSubject<string | null>(null);
-  public splashSubject = new Subject<void>();
+  // Estado con Signals
+  public currentUser = signal<Usuario | null>(null);
+  public isAuthenticated = computed(() => !!this.getToken());
+  public userRole = computed(() => this.currentUser()?.rol?.nombre?.toUpperCase() || null);
 
-  constructor(
-    private http: HttpClient,
-    @Inject(PLATFORM_ID) private platformId: Object,
-    private router: Router
-  ) {
-    // Cargar datos guardados una vez que el servicio está construido
+  private http = inject(HttpClient);
+  private router = inject(Router);
+  private platformId = inject(PLATFORM_ID);
+
+  constructor() {
     if (isPlatformBrowser(this.platformId)) {
-      const savedRole = this.getSavedRole();
-      if (savedRole) this.roleSubject.next(savedRole);
-      const savedName = this.getSavedUserName();
-      if (savedName) this.userNameSubject.next(savedName);
-      const savedId = this.getSavedUserId();
-      if (savedId) this.userIdSubject.next(savedId);
+      const savedUser = localStorage.getItem(this.userKey);
+      if (savedUser) {
+        this.currentUser.set(JSON.parse(savedUser));
+      }
     }
   }
 
-  login(credentials: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/login`, credentials).pipe(
-      tap((response: any) => {
-        // Soportar 'token' o 'access_token' por si el backend varía
-        const token = response.token || response.access_token;
+  loginWithGoogle(): void {
+    // Redirección directa al endpoint de Laravel Socialite
+    window.location.href = `${this.apiUrl}/auth/google`;
+  }
 
-        if (token && isPlatformBrowser(this.platformId)) {
-          localStorage.setItem(this.tokenKey, token);
-          
-          const role = response.user?.rol?.nombre?.toUpperCase();
-          if (role) {
-            localStorage.setItem(this.roleKey, role);
-            this.roleSubject.next(role);
-          }
-          
-          const userName = response.user?.nombre;
-          if (userName) {
-            localStorage.setItem(this.userNameKey, userName);
-            this.userNameSubject.next(userName);
-          }
-
-          const userId = response.user?.id;
-          if (userId) {
-            localStorage.setItem(this.userIdKey, userId.toString());
-            this.userIdSubject.next(userId.toString());
-          }
-          this.splashSubject.next();
-        }
+  handleAuthCallback(token: string): Observable<any> {
+    localStorage.setItem(this.tokenKey, token);
+    // Obtenemos los datos del usuario después de guardar el token
+    return this.http.get<any>(`${this.apiUrl}/user`).pipe(
+      tap(response => {
+        const user = response.data || response;
+        this.currentUser.set(user);
+        localStorage.setItem(this.userKey, JSON.stringify(user));
       })
     );
   }
@@ -73,72 +52,13 @@ export class AuthService {
   logout(): void {
     if (isPlatformBrowser(this.platformId)) {
       localStorage.removeItem(this.tokenKey);
-      localStorage.removeItem(this.roleKey);
-      localStorage.removeItem(this.userNameKey);
-      localStorage.removeItem(this.userIdKey);
+      localStorage.removeItem(this.userKey);
     }
-
-    this.roleSubject.next(null);
-    this.userNameSubject.next(null);
-    this.userIdSubject.next(null);
+    this.currentUser.set(null);
     this.router.navigate(['/login']);
   }
 
   getToken(): string | null {
-    if (isPlatformBrowser(this.platformId)) {
-      return localStorage.getItem(this.tokenKey);
-    }
-    return null;
-  }
-
-  isAuthenticated(): boolean {
-    return !!this.getToken();
-  }
-
-  getRoleObservable(): Observable<string | null> {
-    return this.roleSubject.asObservable();
-  }
-
-  getUserNameObservable(): Observable<string | null> {
-    return this.userNameSubject.asObservable();
-  }
-
-  getRole(): string | null {
-    // Intentar obtener del Subject, si no, leer de storage (para F5)
-    if (!this.roleSubject.value) {
-      const savedRole = this.getSavedRole();
-      if (savedRole) this.roleSubject.next(savedRole);
-    }
-    return this.roleSubject.value;
-  }
-
-  getUserName(): string | null {
-    return this.userNameSubject.value;
-  }
-
-  getUserId(): string | null {
-    return this.userIdSubject.value;
-  }
-
-  private getSavedRole(): string | null {
-    if (isPlatformBrowser(this.platformId)) {
-      const role = localStorage.getItem(this.roleKey);
-      return role ? role.toUpperCase() : null;
-    }
-    return null;
-  }
-
-  private getSavedUserName(): string | null {
-    if (isPlatformBrowser(this.platformId)) {
-      return localStorage.getItem(this.userNameKey);
-    }
-    return null;
-  }
-
-  private getSavedUserId(): string | null {
-    if (isPlatformBrowser(this.platformId)) {
-      return localStorage.getItem(this.userIdKey);
-    }
-    return null;
+    return isPlatformBrowser(this.platformId) ? localStorage.getItem(this.tokenKey) : null;
   }
 }
