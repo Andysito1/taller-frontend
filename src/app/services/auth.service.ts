@@ -103,7 +103,6 @@ export class AuthService {
   }
 
   getUserName(): string {
-    // Retorna el nombre si el usuario existe, de lo contrario un string vacío o 'Usuario'
-    return this.currentUser()?.nombre || this.currentUser()?.name || '';
+    return this.currentUser()?.nombre || '';
   }
 }
