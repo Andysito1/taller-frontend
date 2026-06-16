@@ -4,7 +4,7 @@ import { LoginComponent } from './pages/auth/login.component';
 import { Cliente } from './pages/cliente/cliente';
 import { Mecanico } from './pages/mecanico/mecanico';
 import { Admin } from './pages/admin/admin';
-import { authGuard, PublicGuard, RoleGuard } from './services/auth.guard';
+import { AuthGuard, PublicGuard, RoleGuard } from './services/auth.guard';
 //import { RecoverComponent } from './pages/auth/recover.component';
 
 export const routes: Routes = [
@@ -21,17 +21,17 @@ export const routes: Routes = [
   {
     path: 'cliente',
     component: Cliente,
-    canActivate: [authGuard, RoleGuard]
+    canActivate: [AuthGuard, RoleGuard]
   },
   {
     path: 'mecanico',
     component: Mecanico,
-    canActivate: [authGuard, RoleGuard]
+    canActivate: [AuthGuard, RoleGuard]
   },
   {
     path: 'admin',
     component: Admin,
-    canActivate: [authGuard, RoleGuard],
+    canActivate: [AuthGuard, RoleGuard],
     children: [
       {
         path: 'clientes',
