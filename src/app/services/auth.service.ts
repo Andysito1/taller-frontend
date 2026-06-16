@@ -101,4 +101,9 @@ export class AuthService {
   getToken(): string | null {
     return isPlatformBrowser(this.platformId) ? localStorage.getItem(this.tokenKey) : null;
   }
+
+  getUserName(): string {
+    // Retorna el nombre si el usuario existe, de lo contrario un string vacío o 'Usuario'
+    return this.currentUser()?.nombre || this.currentUser()?.name || '';
+  }
 }
