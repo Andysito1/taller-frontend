@@ -19,9 +19,12 @@ export class App implements OnInit, OnDestroy {
   protected readonly title = signal('taller');
   public isLoading = signal(true);
   public isFading = signal(false);
-  public isAuthenticated = signal(this.authService.isAuthenticated());
-  public userRole = signal<string | null>(null);
-  public userName = signal(this.authService.getUserName());
+  
+  // Conexión directa a los Signals del servicio (limpio y reactivo)
+  public isAuthenticated = this.authService.isAuthenticated;
+  public userRole = this.authService.userRole;
+  public userName = this.authService.userName;
+
   private authSubscription: Subscription = new Subscription();
 
   // Lógica para decidir si mostrar la barra de navegación principal
@@ -33,19 +36,6 @@ export class App implements OnInit, OnDestroy {
   constructor() {}
 
   ngOnInit(): void {
-    this.authSubscription.add(
-      this.authService.getRoleObservable().subscribe((role: string | null) => {
-        this.isAuthenticated.set(!!role);
-        this.userRole.set(role);
-      })
-    );
-    this.authSubscription.add(
-      this.authService.getUserNameObservable().subscribe((name: string | null) => {
-        // PARCHE SEGURO: Evita el error de asignación de null de forma directa
-        this.userName.set(name || '');
-      })
-    );
-
     // Suscribirse para mostrar animación al iniciar sesión
     this.authSubscription.add(
       this.authService.splashSubject.subscribe(() => {

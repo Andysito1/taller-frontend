@@ -1,10 +1,19 @@
-import { Injectable, PLATFORM_ID, signal, computed, inject } from '@angular/core';
+import { Injectable, PLATFORM_ID, signal, computed, inject, Injector } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, Subject } from 'rxjs';
 import { Router } from '@angular/router';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { environment } from '../../environment';
 import { Usuario } from '../pages/models/usuario.model';
+
+interface AuthResponse {
+  token?: string;
+  access_token?: string;
+  user?: Usuario;
+  data?: Usuario;
+  status?: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -18,22 +27,21 @@ export class AuthService {
   public currentUser = signal<Usuario | null>(null);
   public isAuthenticated = computed(() => !!this.getToken());
   public userRole = computed(() => this.currentUser()?.rol?.nombre?.toUpperCase() || null);
+  public userName = computed(() => this.currentUser()?.nombre || null);
 
-  private http = inject(HttpClient);
-  private router = inject(Router);
-  private platformId = inject(PLATFORM_ID);
+  private readonly http = inject(HttpClient);
+  private readonly router = inject(Router);
+  private readonly platformId = inject(PLATFORM_ID);
+  private readonly injector = inject(Injector);
 
-  // --- Parche de compatibilidad para app.ts ---
-  public splashSubject = new (require('rxjs').Subject)<void>();
+  public splashSubject = new Subject<void>();
 
-  getRoleObservable(): import('rxjs').Observable<string | null> {
-    return require('@angular/core/rxjs-interop').toObservable(this.userRole);
+  getRoleObservable(): Observable<string | null> {
+    return toObservable(this.userRole, { injector: this.injector });
   }
 
-  getUserNameObservable(): import('rxjs').Observable<string | null> {
-    return require('@angular/core/rxjs-interop').toObservable(
-      require('@angular/core').computed(() => this.currentUser()?.nombre || null)
-    );
+  getUserNameObservable(): Observable<string | null> {
+    return toObservable(this.userName, { injector: this.injector });
   }
 
   getUserName(): string {
@@ -44,34 +52,39 @@ export class AuthService {
     if (isPlatformBrowser(this.platformId)) {
       const savedUser = localStorage.getItem(this.userKey);
       if (savedUser) {
-        this.currentUser.set(JSON.parse(savedUser));
+        try { this.currentUser.set(JSON.parse(savedUser)); } catch { localStorage.removeItem(this.userKey); }
       }
     }
   }
 
   // --- Métodos de Autenticación ---
 
-  login(credentials: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/login`, credentials).pipe(
+  login(credentials: Record<string, unknown>): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(
       tap(response => {
         const token = response.token || response.access_token;
         if (token) {
-          localStorage.setItem(this.tokenKey, token);
           const user = response.user || response.data;
-          this.currentUser.set(user);
-          localStorage.setItem(this.userKey, JSON.stringify(user));
+          this.setSession(token, user!);
+          this.splashSubject.next();
         }
       })
     );
   }
 
-  register(data: any): Observable<any> {
+  private setSession(token: string, user: Usuario): void {
+    localStorage.setItem(this.tokenKey, token);
+    localStorage.setItem(this.userKey, JSON.stringify(user));
+    this.currentUser.set(user);
+  }
+
+  register(data: Record<string, unknown>): Observable<unknown> {
     return this.http.post(`${this.apiUrl}/register`, data);
   }
 
-  verifyRegistrationCode(email: string, code: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/verify-registration`, { email, code }).pipe(
-      tap((response: any) => {
+  verifyRegistrationCode(email: string, code: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/verify-registration`, { email, code }).pipe(
+      tap((response) => {
         if (response.token) {
           this.handleAuthCallback(response.token).subscribe();
         }
@@ -81,11 +94,11 @@ export class AuthService {
 
   // --- Métodos de Recuperación de Contraseña ---
 
-  sendPasswordResetCode(email: string): Observable<any> {
+  sendPasswordResetCode(email: string): Observable<unknown> {
     return this.http.post(`${this.apiUrl}/forgot-password`, { email });
   }
 
-  resetPassword(data: any): Observable<any> {
+  resetPassword(data: Record<string, unknown>): Observable<unknown> {
     return this.http.post(`${this.apiUrl}/reset-password`, data);
   }
 
@@ -94,14 +107,11 @@ export class AuthService {
     window.location.href = `${this.apiUrl}/auth/google`;
   }
 
-  handleAuthCallback(token: string): Observable<any> {
-    localStorage.setItem(this.tokenKey, token);
+  handleAuthCallback(token: string): Observable<AuthResponse> {
     // Obtenemos los datos del usuario después de guardar el token
-    return this.http.get<any>(`${this.apiUrl}/user`).pipe(
+    return this.http.get<AuthResponse>(`${this.apiUrl}/user`).pipe(
       tap(response => {
-        const user = response.data || response;
-        this.currentUser.set(user);
-        localStorage.setItem(this.userKey, JSON.stringify(user));
+        this.setSession(token, response.data || (response as unknown as Usuario));
       })
     );
   }
