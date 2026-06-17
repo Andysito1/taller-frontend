@@ -1,92 +1,122 @@
-import { Component, signal, OnInit, OnDestroy, inject, ChangeDetectionStrategy, computed } from '@angular/core';
-import { RouterOutlet, RouterLink } from '@angular/router';
-import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { AuthService } from './services/auth.service';
-import { PushNotificationService } from './services/push-notification.service';
-import { Subscription } from 'rxjs';
+import { Injectable, PLATFORM_ID, signal, computed, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { Observable, tap, Subject } from 'rxjs';
+import { toObservable } from '@angular/core/rxjs-interop'; // 👈 Importación correcta para Angular 17+
+import { Router } from '@angular/router';
+import { environment } from '../../environment';
+import { Usuario } from '../pages/models/usuario.model';
 
-@Component({
-  selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, CommonModule, NgOptimizedImage],
-  templateUrl: './app.html',
-  styleUrls: ['./app.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+@Injectable({
+  providedIn: 'root'
 })
-export class App implements OnInit, OnDestroy {
-  private authService = inject(AuthService);
-  private pushService = inject(PushNotificationService);
+export class AuthService {
+  private apiUrl = environment.apiUrl;
+  private tokenKey = 'auth_token';
+  private userKey = 'auth_user';
+  
+  // Estado con Signals
+  public currentUser = signal<Usuario | null>(null);
+  public isAuthenticated = computed(() => !!this.getToken());
+  public userRole = computed(() => this.currentUser()?.rol?.nombre?.toUpperCase() || null);
 
-  protected readonly title = signal('taller');
-  public isLoading = signal(true);
-  public isFading = signal(false);
-  public isAuthenticated = signal(this.authService.isAuthenticated());
-  public userRole = signal<string | null>(null);
-  public userName = signal(this.authService.getUserName());
-  private authSubscription: Subscription = new Subscription();
+  // 👇 PROPIEDADES Y OBSERVABLES QUE AGREGAREMOS PARA COMPATIBILIDAD CON APP.TS
+  public splashSubject = new Subject<void>();
 
-  // Lógica para decidir si mostrar la barra de navegación principal
-  public showMainNavbar = computed(() => {
-    // Ocultamos la barra principal (landing/pública) si el usuario es ADMIN
-    return this.userRole() !== 'ADMIN';
-  });
+  private http = inject(HttpClient);
+  private router = inject(Router);
+  private platformId = inject(PLATFORM_ID);
 
-  constructor() {}
-
-  ngOnInit(): void {
-    this.authSubscription.add(
-      this.authService.getRoleObservable().subscribe((role: string | null) => {
-        this.isAuthenticated.set(!!role);
-        this.userRole.set(role);
-      })
-    );
-    
-    this.authSubscription.add(
-      this.authService.getUserNameObservable().subscribe((name: string | null) => {
-        // CORRECCIÓN: Si name es null, se asigna un string vacío para evitar el error TS2345
-        this.userName.set(name || '');
-      })
-    );
-
-    // Suscribirse para mostrar animación al iniciar sesión
-    this.authSubscription.add(
-      this.authService.splashSubject.subscribe(() => {
-        this.runAnimation();
-      })
-    );
-
-    // Animación inicial (F5)
-    this.runAnimation();
-
-    // Inicializar push si ya está autenticado
-    if (this.isAuthenticated()) {
-      this.pushService.initialize();
+  constructor() {
+    if (isPlatformBrowser(this.platformId)) {
+      const savedUser = localStorage.getItem(this.userKey);
+      if (savedUser) {
+        this.currentUser.set(JSON.parse(savedUser));
+      }
     }
   }
 
-  private runAnimation() {
-    this.isLoading.set(true);
-    this.isFading.set(false);
+  // --- Métodos de Compatibilidad RxJS / Signals ---
 
-    setTimeout(() => {
-      this.isFading.set(true); // Inicia el desvanecimiento
-      setTimeout(() => {
-        this.isLoading.set(false); // Elimina del DOM después de la transición
-      }, 500); // Tiempo que dura el desvanecimiento (0.5s)
-    }, 1000); // Tiempo de carga (1s)
+  getRoleObservable(): Observable<string | null> {
+    return toObservable(this.userRole);
   }
 
-  ngOnDestroy(): void {
-    this.authSubscription.unsubscribe();
+  getUserNameObservable(): Observable<string | null> {
+    return toObservable(computed(() => this.currentUser()?.nombre || null));
   }
 
-  scrollTo(sectionId: string): void {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
+  getUserName(): string {
+    return this.currentUser()?.nombre || '';
+  }
+
+  // --- Métodos de Autenticación ---
+
+  login(credentials: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/login`, credentials).pipe(
+      tap(response => {
+        const token = response.token || response.access_token;
+        if (token) {
+          localStorage.setItem(this.tokenKey, token);
+          const user = response.user || response.data;
+          this.currentUser.set(user);
+          localStorage.setItem(this.userKey, JSON.stringify(user));
+        }
+      })
+    );
+  }
+
+  register(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/register`, data);
+  }
+
+  verifyRegistrationCode(email: string, code: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/verify-registration`, { email, code }).pipe(
+      tap((response: any) => {
+        if (response.token) {
+          this.handleAuthCallback(response.token).subscribe();
+        }
+      })
+    );
+  }
+
+  // --- Métodos de Recuperación de Contraseña ---
+
+  sendPasswordResetCode(email: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/forgot-password`, { email });
+  }
+
+  // --- Métodos de Recuperación de Contraseña ---
+
+  resetPassword(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/reset-password`, data);
+  }
+
+  loginWithGoogle(): void {
+    window.location.href = `${this.apiUrl}/auth/google`;
+  }
+
+  handleAuthCallback(token: string): Observable<any> {
+    localStorage.setItem(this.tokenKey, token);
+    return this.http.get<any>(`${this.apiUrl}/user`).pipe(
+      tap(response => {
+        const user = response.data || response;
+        this.currentUser.set(user);
+        localStorage.setItem(this.userKey, JSON.stringify(user));
+      })
+    );
   }
 
   logout(): void {
-    this.authService.logout();
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.removeItem(this.tokenKey);
+      localStorage.removeItem(this.userKey);
+    }
+    this.currentUser.set(null);
+    this.router.navigate(['/login']);
+  }
+
+  getToken(): string | null {
+    return isPlatformBrowser(this.platformId) ? localStorage.getItem(this.tokenKey) : null;
   }
 }
