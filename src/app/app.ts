@@ -39,9 +39,11 @@ export class App implements OnInit, OnDestroy {
         this.userRole.set(role);
       })
     );
+    
     this.authSubscription.add(
       this.authService.getUserNameObservable().subscribe((name: string | null) => {
-        this.userName.set(name);
+        // CORRECCIÓN: Si name es null, se asigna un string vacío para evitar el error TS2345
+        this.userName.set(name || '');
       })
     );
 
