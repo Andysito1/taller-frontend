@@ -1,7 +1,7 @@
 import { Injectable, PLATFORM_ID, signal, computed, inject, Injector } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap, Subject } from 'rxjs';
+import { Observable, tap, Subject, switchMap, of } from 'rxjs';
 import { Router } from '@angular/router';
 import { environment } from '../../environment';
 import { Usuario } from '../pages/models/usuario.model';
@@ -24,14 +24,14 @@ export class AuthService {
   
   // Estado con Signals
   public currentUser = signal<Usuario | null>(null);
-  public isAuthenticated = computed(() => !!this.getToken());
+  // isAuthenticated ahora depende de currentUser, lo que lo hace 100% reactivo
+  public isAuthenticated = computed(() => !!this.currentUser());
   public userRole = computed(() => this.currentUser()?.rol?.nombre?.toUpperCase() || null);
   public userName = computed(() => this.currentUser()?.nombre || null);
 
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
   private readonly platformId = inject(PLATFORM_ID);
-  private readonly injector = inject(Injector);
 
   public splashSubject = new Subject<void>();
 
@@ -75,10 +75,11 @@ export class AuthService {
 
   verifyRegistrationCode(email: string, code: string): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/verify-registration`, { email, code }).pipe(
-      tap((response) => {
+      switchMap((response) => {
         if (response.token) {
-          this.handleAuthCallback(response.token).subscribe();
+          return this.handleAuthCallback(response.token);
         }
+        return of(response);
       })
     );
   }

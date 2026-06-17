@@ -1,4 +1,4 @@
-import { Injectable, inject, signal, PLATFORM_ID, Inject } from '@angular/core';
+import { Injectable, inject, signal, PLATFORM_ID } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { isPlatformBrowser } from '@angular/common';
 import { 
@@ -15,14 +15,14 @@ import { environment } from '../../environment';
   providedIn: 'root'
 })
 export class PushNotificationService {
-  private http = inject(HttpClient);
-  private authService = inject(AuthService);
-  private platformId = inject(PLATFORM_ID);
+  private readonly http = inject(HttpClient);
+  private readonly authService = inject(AuthService);
+  private readonly platformId = inject(PLATFORM_ID);
   private apiUrl = environment.apiUrl;
 
   // State using Signals
-  public registrationToken = signal<string | null>(null);
-  public lastNotification = signal<PushNotificationSchema | null>(null);
+  public readonly registrationToken = signal<string | null>(null);
+  public readonly lastNotification = signal<PushNotificationSchema | null>(null);
   public pendingOrdenId = signal<number | null>(null);
 
   async initialize() {
@@ -43,6 +43,7 @@ export class PushNotificationService {
     this.setupListeners();
   }
 
+  // Los listeners solo se registran en el navegador gracias al initialize()
   private setupListeners() {
     PushNotifications.addListener('registration', (token: Token) => {
       this.registrationToken.set(token.value);
@@ -64,6 +65,7 @@ export class PushNotificationService {
   }
 
   private processPayload(data: any) {
+    console.log('Notificación push recibida con datos:', data);
     if (data?.orden_id) {
       this.pendingOrdenId.set(Number(data.orden_id));
     }

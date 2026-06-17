@@ -1,11 +1,7 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './pages/home/home.component';
 import { LoginComponent } from './pages/auth/login.component';
-import { Cliente } from './pages/cliente/cliente';
-import { Mecanico } from './pages/mecanico/mecanico';
-import { Admin } from './pages/admin/admin';
 import { AuthGuard, PublicGuard, RoleGuard } from './services/auth.guard';
-//import { RecoverComponent } from './pages/auth/recover.component';
 
 export const routes: Routes = [
   {
@@ -19,18 +15,28 @@ export const routes: Routes = [
     canActivate: [PublicGuard]
   },
   {
+    path: 'registro',
+    loadComponent: () => import('./pages/auth/register').then(m => m.Register),
+    canActivate: [PublicGuard]
+  },
+  {
+    path: 'recuperar',
+    loadComponent: () => import('./pages/auth/forgot-password').then(m => m.ForgotPassword),
+    canActivate: [PublicGuard]
+  },
+  {
     path: 'cliente',
-    component: Cliente,
+    loadComponent: () => import('./pages/cliente/cliente').then(m => m.Cliente),
     canActivate: [AuthGuard, RoleGuard]
   },
   {
     path: 'mecanico',
-    component: Mecanico,
+    loadComponent: () => import('./pages/mecanico/mecanico').then(m => m.Mecanico),
     canActivate: [AuthGuard, RoleGuard]
   },
   {
     path: 'admin',
-    component: Admin,
+    loadComponent: () => import('./pages/admin/admin').then(m => m.Admin),
     canActivate: [AuthGuard, RoleGuard],
     children: [
       {
@@ -60,10 +66,6 @@ export const routes: Routes = [
       { path: '', redirectTo: 'clientes', pathMatch: 'full' }
     ]
   },
-//   {
-//     path: 'recuperar',
-//     component: RecoverComponent
-//   },
   {
     path: '**',
     redirectTo: ''

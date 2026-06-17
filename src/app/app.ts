@@ -1,4 +1,5 @@
-import { Component, signal, OnInit, OnDestroy, inject, ChangeDetectionStrategy, computed } from '@angular/core';
+import { Component, signal, OnInit, OnDestroy, inject, ChangeDetectionStrategy, computed, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { RouterOutlet, RouterLink } from '@angular/router';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { AuthService } from './services/auth.service';
@@ -15,6 +16,7 @@ import { Subscription } from 'rxjs';
 export class App implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private pushService = inject(PushNotificationService);
+  private platformId = inject(PLATFORM_ID);
 
   protected readonly title = signal('taller');
   public isLoading = signal(true);
@@ -43,12 +45,14 @@ export class App implements OnInit, OnDestroy {
       })
     );
 
-    // Animación inicial (F5)
-    this.runAnimation();
-
-    // Inicializar push si ya está autenticado
-    if (this.isAuthenticated()) {
-      this.pushService.initialize();
+    // Solo ejecutar lógica de navegador
+    if (isPlatformBrowser(this.platformId)) {
+      this.runAnimation();
+      
+      // Inicializar push si ya está autenticado
+      if (this.isAuthenticated()) {
+        this.pushService.initialize();
+      }
     }
   }
 
