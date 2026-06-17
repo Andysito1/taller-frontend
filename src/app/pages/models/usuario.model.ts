@@ -11,4 +11,12 @@ export interface Usuario {
   id_rol: number;
   rol: Rol;
   activo: boolean;
+
+  telefono?: string;
+    numero_documento?: string;
+    tipo_documento?: {
+        id: number;
+        nombre: string;
+        abreviatura: string;
+    };
 }
