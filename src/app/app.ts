@@ -30,23 +30,6 @@ export class App implements OnInit, OnDestroy {
     return this.userRole() !== 'ADMIN';
   });
 
-  // --- Parche de compatibilidad para app.ts ---
-  public splashSubject = new (require('rxjs').Subject)<void>();
-
-  getRoleObservable(): import('rxjs').Observable<string | null> {
-    return require('@angular/core/rxjs-interop').toObservable(this.userRole);
-  }
-
-  getUserNameObservable(): import('rxjs').Observable<string | null> {
-    return require('@angular/core/rxjs-interop').toObservable(
-      require('@angular/core').computed(() => this.currentUser()?.nombre || null)
-    );
-  }
-
-  getUserName(): string {
-    return this.currentUser()?.nombre || '';
-  }
-
   constructor() {}
 
   ngOnInit(): void {
