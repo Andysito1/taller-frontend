@@ -41,7 +41,9 @@ export class App implements OnInit, OnDestroy {
     // Suscribirse para mostrar animación al iniciar sesión
     this.authSubscription.add(
       this.authService.splashSubject.subscribe(() => {
-        this.runAnimation();
+        if (isPlatformBrowser(this.platformId)) {
+          this.runAnimation();
+        }
       })
     );
 

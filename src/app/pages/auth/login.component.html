@@ -1,7 +1,7 @@
 <section class="auth-section">
   <div class="auth-overlay"></div>
   <div class="login-card">
-    <h2 class="auth-title">Bienvenido</h2>
+    <h2 class="auth-title">Bienvenidos</h2>
     <p class="subtitle">Ingresa tus credenciales para continuar</p>
     
     <form class="auth-form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
@@ -51,10 +51,10 @@
     }
 
     <div class="auth-footer">
-      <a routerLink="/auth/forgot-password" class="link-btn">
+      <a routerLink="/recuperar" class="link-btn">
         ¿Olvidaste tu contraseña?
       </a>
-      <p class="mt-2">¿No tienes cuenta? <a routerLink="/auth/register" class="link-secondary">Regístrate aquí</a></p>
+      <p class="mt-2">¿No tienes cuenta? <a routerLink="/registro" class="link-secondary">Regístrate aquí</a></p>
       <div class="divider"></div>
       <a routerLink="/" class="link-secondary">
         Volver al inicio
