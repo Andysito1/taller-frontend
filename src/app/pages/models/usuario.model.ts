@@ -19,4 +19,5 @@ export interface Usuario {
         nombre: string;
         abreviatura: string;
     };
+  direccion?: string;
 }
