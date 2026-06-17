@@ -3,7 +3,6 @@ import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap, Subject } from 'rxjs';
 import { Router } from '@angular/router';
-import { toObservable } from '@angular/core/rxjs-interop';
 import { environment } from '../../environment';
 import { Usuario } from '../pages/models/usuario.model';
 
@@ -35,14 +34,6 @@ export class AuthService {
   private readonly injector = inject(Injector);
 
   public splashSubject = new Subject<void>();
-
-  getRoleObservable(): Observable<string | null> {
-    return toObservable(this.userRole, { injector: this.injector });
-  }
-
-  getUserNameObservable(): Observable<string | null> {
-    return toObservable(this.userName, { injector: this.injector });
-  }
 
   getUserName(): string {
     return this.currentUser()?.nombre || '';
