@@ -23,6 +23,23 @@ export class AuthService {
   private router = inject(Router);
   private platformId = inject(PLATFORM_ID);
 
+  // --- Parche de compatibilidad para app.ts ---
+  public splashSubject = new (require('rxjs').Subject)<void>();
+
+  getRoleObservable(): import('rxjs').Observable<string | null> {
+    return require('@angular/core/rxjs-interop').toObservable(this.userRole);
+  }
+
+  getUserNameObservable(): import('rxjs').Observable<string | null> {
+    return require('@angular/core/rxjs-interop').toObservable(
+      require('@angular/core').computed(() => this.currentUser()?.nombre || null)
+    );
+  }
+
+  getUserName(): string {
+    return this.currentUser()?.nombre || '';
+  }
+
   constructor() {
     if (isPlatformBrowser(this.platformId)) {
       const savedUser = localStorage.getItem(this.userKey);
@@ -102,7 +119,4 @@ export class AuthService {
     return isPlatformBrowser(this.platformId) ? localStorage.getItem(this.tokenKey) : null;
   }
 
-  getUserName(): string {
-    return this.currentUser()?.nombre || '';
-  }
 }
