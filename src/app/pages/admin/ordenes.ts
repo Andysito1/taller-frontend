@@ -30,11 +30,14 @@ export class Ordenes implements OnInit {
   private adminService = inject(AdminService);
   private fb = inject(FormBuilder);
   private pushService = inject(PushNotificationService);
+  private platformId = inject(PLATFORM_ID);
 
   constructor() {
     // EFECTO PARA ACTUALIZACIÓN EN VIVO
-    // Se dispara cada vez que el PushNotificationService detecta un cambio en una orden
     effect(() => {
+      // IMPORTANTE: Los effects deben estar protegidos si tocan lógica de navegador
+      if (!isPlatformBrowser(this.platformId)) return;
+
       const updatedOrderId = this.pushService.pendingOrdenId();
       
       if (updatedOrderId) {

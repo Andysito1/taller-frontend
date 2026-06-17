@@ -24,7 +24,6 @@ export class AuthService {
   
   // Estado con Signals
   public currentUser = signal<Usuario | null>(null);
-  // isAuthenticated ahora depende de currentUser, lo que lo hace 100% reactivo
   public isAuthenticated = computed(() => !!this.currentUser());
   public userRole = computed(() => this.currentUser()?.rol?.nombre?.toUpperCase() || null);
   public userName = computed(() => this.currentUser()?.nombre || null);
@@ -56,16 +55,20 @@ export class AuthService {
         const token = response.token || response.access_token;
         if (token) {
           const user = response.user || response.data;
-          this.setSession(token, user!);
-          this.splashSubject.next();
+          if (user) { 
+            this.setSession(token, user);
+            this.splashSubject.next();
+          }
         }
       })
     );
   }
 
   private setSession(token: string, user: Usuario): void {
-    localStorage.setItem(this.tokenKey, token);
-    localStorage.setItem(this.userKey, JSON.stringify(user));
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem(this.tokenKey, token);
+      localStorage.setItem(this.userKey, JSON.stringify(user));
+    }
     this.currentUser.set(user);
   }
 
@@ -95,12 +98,13 @@ export class AuthService {
   }
 
   loginWithGoogle(): void {
-    // Redirección directa al endpoint de Laravel Socialite
-    window.location.href = `${this.apiUrl}/auth/google`;
+    // CORREGIDO: Evita que el servidor intente acceder al objeto global 'window'
+    if (isPlatformBrowser(this.platformId)) {
+      window.location.href = `${this.apiUrl}/auth/google`;
+    }
   }
 
   handleAuthCallback(token: string): Observable<AuthResponse> {
-    // Obtenemos los datos del usuario después de guardar el token
     return this.http.get<AuthResponse>(`${this.apiUrl}/user`).pipe(
       tap(response => {
         this.setSession(token, response.data || (response as unknown as Usuario));
@@ -120,5 +124,4 @@ export class AuthService {
   getToken(): string | null {
     return isPlatformBrowser(this.platformId) ? localStorage.getItem(this.tokenKey) : null;
   }
-
 }
