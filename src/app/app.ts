@@ -39,6 +39,8 @@ export class App implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // Suscribirse para mostrar animación al iniciar sesión
+    if (isPlatformBrowser(this.platformId)) {
+    
     this.authSubscription.add(
       this.authService.splashSubject.subscribe(() => {
         if (isPlatformBrowser(this.platformId)) {
@@ -46,9 +48,7 @@ export class App implements OnInit, OnDestroy {
         }
       })
     );
-
-    // Solo ejecutar lógica de navegador
-    if (isPlatformBrowser(this.platformId)) {
+    
       this.runAnimation();
       
       // Inicializar push si ya está autenticado
@@ -59,6 +59,7 @@ export class App implements OnInit, OnDestroy {
   }
 
   private runAnimation() {
+    if (!isPlatformBrowser(this.platformId)) return;
     this.isLoading.set(true);
     this.isFading.set(false);
 
@@ -75,6 +76,7 @@ export class App implements OnInit, OnDestroy {
   }
 
   scrollTo(sectionId: string): void {
+    if (!isPlatformBrowser(this.platformId)) return;
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });

@@ -88,7 +88,6 @@ export class Ordenes implements OnInit {
   // Mantenemos esto para validaciones si fuera necesario, pero usaremos allVehiculos en el HTML
   public vehiculosDisponibles = computed(() => {
     const lista = this.allVehiculos();
-    console.log('Calculando vehículos disponibles de una lista de:', lista.length);
     return lista.filter(v => {
       if (!v.ordenes || v.ordenes.length === 0) return true;
       return !this.estaOcupado(v);

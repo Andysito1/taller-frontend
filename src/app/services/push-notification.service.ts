@@ -26,21 +26,18 @@ export class PushNotificationService {
   public pendingOrdenId = signal<number | null>(null);
 
   async initialize() {
-    if (!isPlatformBrowser(this.platformId)) return;
+    if (!isPlatformBrowser(this.platformId) || typeof window === 'undefined') return;
 
-    let perm = await PushNotifications.checkPermissions();
+    try {
+      let perm = await PushNotifications.checkPermissions();
+      if (perm.receive === 'prompt') perm = await PushNotifications.requestPermissions();
+      if (perm.receive !== 'granted') return;
 
-    if (perm.receive === 'prompt') {
-      perm = await PushNotifications.requestPermissions();
+      await PushNotifications.register();
+      this.setupListeners();
+    } catch (e) {
+      console.warn('PushNotifications no disponibles en este entorno');
     }
-
-    if (perm.receive !== 'granted') {
-      console.warn('Permisos de notificación push denegados.');
-      return;
-    }
-
-    await PushNotifications.register();
-    this.setupListeners();
   }
 
   // Los listeners solo se registran en el navegador gracias al initialize()

@@ -24,12 +24,11 @@ export class AuthService {
   
   // Estado con Signals
   public currentUser = signal<Usuario | null>(null);
-  public isAuthenticated = computed(() => !!this.currentUser());
+  public isAuthenticated = computed(() => this.currentUser() !== null);
   public userRole = computed(() => this.currentUser()?.rol?.nombre?.toUpperCase() || null);
   public userName = computed(() => this.currentUser()?.nombre || null);
 
   private readonly http = inject(HttpClient);
-  private readonly router = inject(Router);
   private readonly platformId = inject(PLATFORM_ID);
 
   public splashSubject = new Subject<void>();
@@ -39,7 +38,8 @@ export class AuthService {
   }
 
   constructor() {
-    if (isPlatformBrowser(this.platformId)) {
+    // Usamos una comprobación doble de seguridad para el constructor del servicio global
+    if (isPlatformBrowser(this.platformId) && typeof localStorage !== 'undefined') {
       const savedUser = localStorage.getItem(this.userKey);
       if (savedUser) {
         try { this.currentUser.set(JSON.parse(savedUser)); } catch { localStorage.removeItem(this.userKey); }
@@ -118,7 +118,8 @@ export class AuthService {
       localStorage.removeItem(this.userKey);
     }
     this.currentUser.set(null);
-    this.router.navigate(['/login']);
+    // Inyectamos el router localmente para romper la dependencia circular
+    inject(Router).navigate(['/login']);
   }
 
   getToken(): string | null {

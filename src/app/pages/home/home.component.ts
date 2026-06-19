@@ -1,6 +1,5 @@
 import { Component, signal, effect, OnDestroy, inject, PLATFORM_ID, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule, isPlatformBrowser, NgOptimizedImage } from '@angular/common';
-import { title } from 'process';
 
 @Component({
   selector: 'app-home',

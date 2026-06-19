@@ -6,8 +6,7 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test",
-    "serve:ssr:Crud_Angular": "node dist/Crud_Angular/server/server.mjs"
+    "test": "ng test"
   },
   "prettier": {
     "printWidth": 100,
