@@ -1,8 +1,13 @@
 <section class="auth-section">
   <div class="auth-overlay"></div>
   <div class="login-card">
-    <h2 class="auth-title">Bienvenidos</h2>
-    <p class="subtitle">Ingresa tus credenciales para continuar</p>
+    <div class="brand-mark">Xtreme Performance</div>
+    <h2 class="auth-title">Acceso privado</h2>
+    <p class="subtitle">Usa tu correo y contraseña para entrar al taller digital.</p>
+
+    @if (successMessage()) {
+      <div class="status-banner success">{{ successMessage() }}</div>
+    }
     
     <form class="auth-form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <div class="form-field">
@@ -32,13 +37,11 @@
       <button type="submit" class="primary-btn" [disabled]="loginForm.invalid || isLoading()" aria-label="Ingresar">
         @if (isLoading()) {
           <span class="spinner"></span>
-          Verificando...
+          Validando acceso...
         } @else {
           Ingresar
         }
       </button>
-      
-      <div class="divider-text">o continuar con</div>
 
       <button type="button" class="google-btn" (click)="loginWithGoogle()" aria-label="Iniciar sesión con Google">
         <img src="assets/icons/google.svg" alt="" aria-hidden="true" width="20" height="20">
@@ -54,8 +57,7 @@
       <a routerLink="/recuperar" class="link-btn">
         ¿Olvidaste tu contraseña?
       </a>
-      <p class="mt-2">¿No tienes cuenta? <a routerLink="/registro" class="link-secondary">Regístrate aquí</a></p>
-      <div class="divider"></div>
+      <p class="footer-note">Si no recuerdas tu acceso, inicia el proceso de recuperación desde aquí.</p>
       <a routerLink="/" class="link-secondary">
         Volver al inicio
       </a>

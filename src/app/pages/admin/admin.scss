@@ -19,11 +19,11 @@
 
 .sidebar {
   width: 260px;
-  background-color: #2c3e50;
+  background: linear-gradient(180deg, #09090b, #17171b);
   color: #ecf0f1;
   display: flex;
   flex-direction: column;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 2px 0 28px rgba(0, 0, 0, 0.35);
   flex-shrink: 0;
 }
 
@@ -52,14 +52,14 @@
     border-left: 4px solid transparent;
 
     &:hover {
-      background-color: #34495e;
+      background-color: rgba(239, 68, 68, 0.1);
       color: #ffffff;
     }
 
     &.active {
-      background-color: #202e3c;
+      background-color: rgba(239, 68, 68, 0.16);
       color: #ffffff;
-      border-left-color: #3498db;
+      border-left-color: #ef4444;
     }
   }
 }
@@ -72,7 +72,7 @@
   button {
     width: 100%;
     padding: 12px;
-    background-color: #e74c3c;
+    background: linear-gradient(135deg, #ef4444, #7f1d1d);
     color: white;
     border: none;
     border-radius: 4px;
@@ -82,7 +82,7 @@
     transition: background-color 0.2s;
 
     &:hover {
-      background-color: #c0392b;
+      filter: brightness(1.05);
     }
   }
 }

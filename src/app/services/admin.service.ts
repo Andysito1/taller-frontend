@@ -117,6 +117,14 @@ export class AdminService {
       map(res => this.extractData<Cliente>(res))
     );
   }
+
+  sendCustomerReminder(id: number, template: 'suave' | 'persuasiva', message?: string): Observable<unknown> {
+    return this.http.post(`${this.apiUrl}/clientes/${id}/recordatorio-correo`, {
+      template,
+      mensaje: message,
+    });
+  }
+
   updateVehiculo(id: number, data: FormData): Observable<any> {
     return this.http.post(`${this.apiUrl}/vehiculos/${id}?_method=PUT`, data);
   }

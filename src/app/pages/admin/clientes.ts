@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 import Swal from 'sweetalert2';
 import { AdminService } from '../../services/admin.service';
 import { Usuario } from '../models/usuario.model';
+import { resolveHttpErrorMessage } from '../../services/http-error-messages';
 
 @Component({
   selector: 'app-clientes',
@@ -25,6 +26,10 @@ export class Clientes implements OnInit {
   private allUsers = signal<Usuario[]>([]);
   public loading = signal(true);
   public error = signal<string | null>(null);
+  public sendingReminderId = signal<number | null>(null);
+  public reminderTemplate = signal<'suave' | 'persuasiva'>('suave');
+  public reminderSuccess = signal<string | null>(null);
+  public reminderError = signal<string | null>(null);
 
   // Signals para los filtros
   public filtroNombre = signal<string>('');
@@ -33,6 +38,10 @@ export class Clientes implements OnInit {
 
   public readonly tiposDocumento: ('DNI' | 'RUC' | 'CE' | 'PAS')[] = ['DNI', 'RUC', 'CE', 'PAS'];
   public readonly estados = [{value: 'activo', label: 'Activo'}, {value: 'inactivo', label: 'Inactivo'}];
+  public readonly reminderTemplates = [
+    { id: 'suave' as const, label: 'Suave', text: '¿No te hace falta alguna mejora? En Xtreme Performance te esperamos para revisar tu vehículo.' },
+    { id: 'persuasiva' as const, label: 'Persuasiva', text: 'Los mecánicos extrañan tu auto. ¿No querrás arreglar algo? ¡Ven a Xtreme Performance y deja tu auto en manos expertas!' },
+  ];
 
   // Derivamos la lista de clientes desde la señal de todos los usuarios
   public clientes = computed(() => {
@@ -96,6 +105,27 @@ export class Clientes implements OnInit {
     this.filtroNombre.set('');
     this.filtroTipoDoc.set('');
     this.filtroEstado.set('');
+  }
+
+  sendReminder(cliente: Usuario): void {
+    this.sendingReminderId.set(cliente.id);
+    this.reminderSuccess.set(null);
+    this.reminderError.set(null);
+
+    const template = this.reminderTemplate();
+    const message = this.reminderTemplates.find((item) => item.id === template)?.text;
+
+    this.adminService.sendCustomerReminder(cliente.id, template, message).subscribe({
+      next: () => {
+        this.sendingReminderId.set(null);
+        this.reminderSuccess.set(`Recordatorio enviado a ${cliente.nombre}.`);
+      },
+      error: (error) => {
+        this.sendingReminderId.set(null);
+        this.reminderError.set(resolveHttpErrorMessage(error, 'recordatorio-correo'));
+        console.error('Error al enviar recordatorio:', error);
+      },
+    });
   }
 
   toggleActivo(id: number): void {

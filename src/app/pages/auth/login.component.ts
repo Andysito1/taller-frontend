@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject, signal, computed } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
+import { resolveHttpErrorMessage } from '../../services/http-error-messages';
 
 @Component({
   selector: 'app-login',
@@ -11,10 +12,11 @@ import { CommonModule } from '@angular/common';
   styleUrl: './login.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   public loginForm = this.fb.nonNullable.group({
     correo: ['', [Validators.required, Validators.email]],
@@ -22,8 +24,16 @@ export class LoginComponent {
   });
 
   public errorMessage = signal<string | null>(null);
+  public successMessage = signal<string | null>(null);
   public passwordVisible = signal(false);
   public isLoading = signal(false);
+
+  ngOnInit(): void {
+    const resetState = this.route.snapshot.queryParamMap.get('reset');
+    if (resetState === 'success') {
+      this.successMessage.set('Tu contraseña fue actualizada. Inicia sesión con tu nueva clave.');
+    }
+  }
 
   get correo() {
     return this.loginForm.get('correo');
@@ -34,53 +44,49 @@ export class LoginComponent {
   }
 
   onSubmit(): void {
-    if (this.loginForm.valid) {
-      this.isLoading.set(true);
-      this.errorMessage.set(null);
-      
-      const formValue = this.loginForm.value;
-      const credentials = {
-        correo: formValue.correo!,
-        password: formValue.password!
-      };
-
-      this.authService.login(credentials).subscribe({
-        next: (response) => {
-          const role = response.user?.rol?.nombre?.toUpperCase();
-          let path: string;
-          switch (role) {
-            case 'CLIENTE':
-              path = '/cliente';
-              break;
-            case 'MECANICO':
-              path = '/mecanico';
-              break;
-            case 'ADMIN':
-              path = '/admin';
-              break;
-            default:
-              this.errorMessage.set('Rol de usuario no reconocido. No se puede redirigir.');
-              this.isLoading.set(false);
-              return;
-          }
-          this.router.navigate([path]);
-        },
-        error: (error) => {
-          console.error('Error en login:', error);
-          this.isLoading.set(false);
-          if (error.status === 422 && error.error?.errors) {
-            // Manejo específico para errores de validación de Laravel (422)
-            const validationErrors = Object.values(error.error.errors).flat().join(' ');
-            this.errorMessage.set(validationErrors || 'Error de validación.');
-          } else if (error.error?.message) {
-            // Captura el mensaje específico del backend para errores 401, etc.
-            this.errorMessage.set(error.error.message);
-          } else {
-            this.errorMessage.set('No se pudo iniciar sesión. Verifique sus credenciales o intente más tarde.');
-          }
-        }
-      });
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+      return;
     }
+
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
+
+    const formValue = this.loginForm.getRawValue();
+    const credentials = {
+      correo: formValue.correo.trim(),
+      password: formValue.password,
+    };
+
+    this.authService.login(credentials).subscribe({
+      next: (response) => {
+        const user = response.user || response.data;
+        const role = user?.rol?.nombre?.toUpperCase();
+
+        if (role === 'CLIENTE') {
+          this.router.navigate(['/cliente']);
+          return;
+        }
+
+        if (role === 'MECANICO') {
+          this.router.navigate(['/mecanico']);
+          return;
+        }
+
+        if (role === 'ADMIN') {
+          this.router.navigate(['/admin']);
+          return;
+        }
+
+        this.isLoading.set(false);
+        this.errorMessage.set('No pudimos identificar tu rol de acceso.');
+      },
+      error: (error) => {
+        console.error('Error en login:', error);
+        this.isLoading.set(false);
+        this.errorMessage.set(resolveHttpErrorMessage(error, 'login'));
+      },
+    });
   }
 
   /**

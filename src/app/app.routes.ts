@@ -15,14 +15,19 @@ export const routes: Routes = [
     canActivate: [PublicGuard]
   },
   {
-    path: 'registro',
-    loadComponent: () => import('./pages/auth/register').then(m => m.Register),
-    canActivate: [PublicGuard]
-  },
-  {
     path: 'recuperar',
     loadComponent: () => import('./pages/auth/forgot-password').then(m => m.ForgotPassword),
     canActivate: [PublicGuard]
+  },
+  {
+    path: 'restablecer',
+    loadComponent: () => import('./pages/auth/reset-password').then(m => m.ResetPasswordComponent),
+    canActivate: [PublicGuard]
+  },
+  {
+    path: 'reset-password',
+    redirectTo: 'restablecer',
+    pathMatch: 'full'
   },
   {
     path: 'cliente',
@@ -39,6 +44,10 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/admin/admin.component').then(m => m.AdminComponent),
     canActivate: [AuthGuard, RoleGuard],
     children: [
+      {
+        path: 'recordatorios',
+        loadComponent: () => import('./pages/admin/recordatorios').then(m => m.Recordatorios)
+      },
       {
         path: 'clientes',
         loadComponent: () => import('./pages/admin/clientes').then(m => m.Clientes)

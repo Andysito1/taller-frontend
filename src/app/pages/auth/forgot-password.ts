@@ -1,45 +1,49 @@
-import { Component, signal, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, signal, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import Swal from 'sweetalert2';
+import { resolveHttpErrorMessage } from '../../services/http-error-messages';
 
 @Component({
   selector: 'app-forgot-password',
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
   template: `
     <section class="auth-section">
+      <div class="auth-overlay"></div>
       <div class="login-card">
-        <h2 class="auth-title">Recuperar Acceso</h2>
-        
-        @if (step() === 1) {
-          <p class="subtitle">Ingresa tu correo para recibir un código de recuperación.</p>
-          <div class="form-field">
-            <input #emailInput type="email" placeholder="tu-correo@gmail.com" class="auth-input">
-          </div>
-          <button (click)="requestLink(emailInput.value)" class="primary-btn" [disabled]="isLoading()">
-            {{ isLoading() ? 'Enviando...' : 'Enviar Código' }}
-          </button>
-        } @else {
-          <form [formGroup]="resetForm" (ngSubmit)="onReset()">
-            <p class="subtitle">Ingresa el código y tu nueva contraseña.</p>
-            <div class="form-field">
-              <input type="text" formControlName="code" placeholder="Código de 6 dígitos">
-            </div>
-            <div class="form-field">
-              <input type="password" formControlName="password" placeholder="Nueva contraseña">
-            </div>
-            <div class="form-field">
-              <input type="password" formControlName="password_confirmation" placeholder="Repite la contraseña">
-            </div>
-            <button type="submit" class="primary-btn" [disabled]="resetForm.invalid || isLoading()">
-              {{ isLoading() ? 'Actualizando...' : 'Cambiar Contraseña' }}
-            </button>
-          </form>
+        <div class="brand-mark">Xtreme Performance</div>
+        <h2 class="auth-title">Recuperar acceso</h2>
+        <p class="subtitle">Solicita el código de recuperación para continuar con el restablecimiento.</p>
+
+        @if (errorMessage()) {
+          <div class="error-message">{{ errorMessage() }}</div>
         }
-        
+
+        <form class="auth-form" [formGroup]="requestForm" (ngSubmit)="requestReset()" novalidate>
+          <div class="form-field">
+            <label for="correo">Correo electrónico</label>
+            <input id="correo" type="email" formControlName="correo" placeholder="tu-correo@gmail.com" autocomplete="email" [class.invalid]="email?.invalid && email?.touched">
+            @if (email?.hasError('required') && email?.touched) {
+              <div class="form-field-error">El correo es obligatorio.</div>
+            }
+            @if (email?.hasError('email') && email?.touched) {
+              <div class="form-field-error">Ingresa un correo válido.</div>
+            }
+          </div>
+
+          <button type="submit" class="primary-btn" [disabled]="isLoading()">
+            @if (isLoading()) {
+              <span class="spinner"></span>
+              Enviando código...
+            } @else {
+              Enviar instrucciones
+            }
+          </button>
+        </form>
+
         <div class="auth-footer">
+          <p class="footer-note">Si tu cuenta está activa, te guiaremos al restablecimiento después de validar el correo.</p>
           <a routerLink="/login" class="link-secondary">Volver al login</a>
         </div>
       </div>
@@ -48,60 +52,50 @@ import Swal from 'sweetalert2';
   styleUrl: './login.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ForgotPassword {
+export class ForgotPassword implements OnInit {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
-  public step = signal(1);
   public isLoading = signal(false);
-  public userEmail = '';
+  public errorMessage = signal<string | null>(null);
 
-  public resetForm = this.fb.group({
-    code: ['', [Validators.required, Validators.minLength(6)]],
-    password: ['', [Validators.required, Validators.minLength(8)]],
-    password_confirmation: ['', [Validators.required]]
-  }, { validators: this.passwordMatchValidator });
+  public requestForm = this.fb.nonNullable.group({
+    correo: ['', [Validators.required, Validators.email]],
+  });
 
-  passwordMatchValidator(g: any) {
-    return g.get('password').value === g.get('password_confirmation').value ? null : { mismatch: true };
+  ngOnInit(): void {
+    const queryEmail = this.route.snapshot.queryParamMap.get('email');
+    if (queryEmail) {
+      this.requestForm.patchValue({ correo: queryEmail });
+    }
   }
 
-  requestLink(email: string) {
-    if (!email.includes('@')) return;
-    this.isLoading.set(true);
-    this.userEmail = email;
-
-    this.authService.sendPasswordResetCode(email).subscribe({
-      next: () => {
-        this.isLoading.set(false);
-        this.step.set(2);
-        Swal.fire('Código Enviado', 'Revisa tu Gmail para obtener el código de recuperación.', 'success');
-      },
-      error: () => {
-        this.isLoading.set(false);
-        Swal.fire('Error', 'No encontramos un usuario con ese correo.', 'error');
-      }
-    });
+  get email() {
+    return this.requestForm.get('correo');
   }
 
-  onReset() {
-    if (this.resetForm.invalid) return;
+  requestReset() {
+    if (this.requestForm.invalid) {
+      this.requestForm.markAllAsTouched();
+      return;
+    }
+
     this.isLoading.set(true);
+    this.errorMessage.set(null);
+    const email = this.requestForm.getRawValue().correo.trim().toLowerCase();
 
-    const data = {
-      email: this.userEmail,
-      ...this.resetForm.value
-    };
-
-    this.authService.resetPassword(data).subscribe({
+    this.authService.requestPasswordReset(email).subscribe({
       next: () => {
-        Swal.fire('¡Éxito!', 'Tu contraseña ha sido actualizada. Ya puedes iniciar sesión.', 'success');
-        this.router.navigate(['/login']);
-      },
-      error: (err) => {
         this.isLoading.set(false);
-        Swal.fire('Error', err.error?.message || 'El código es inválido o expiró.', 'error');
+        this.router.navigate(['/restablecer'], {
+          queryParams: { email },
+        });
+      },
+      error: (error) => {
+        this.isLoading.set(false);
+        this.errorMessage.set(resolveHttpErrorMessage(error, 'forgot-password'));
       }
     });
   }

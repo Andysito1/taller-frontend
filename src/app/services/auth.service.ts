@@ -1,7 +1,7 @@
-import { Injectable, PLATFORM_ID, signal, computed, inject, Injector } from '@angular/core';
+import { Injectable, PLATFORM_ID, signal, computed, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap, Subject, switchMap, of } from 'rxjs';
+import { Observable, tap, Subject } from 'rxjs';
 import { Router } from '@angular/router';
 import { environment } from '../../environment';
 import { Usuario } from '../pages/models/usuario.model';
@@ -12,6 +12,14 @@ interface AuthResponse {
   user?: Usuario;
   data?: Usuario;
   status?: string;
+}
+
+export interface PasswordResetRequest {
+  email: string;
+  code?: string;
+  token?: string;
+  password: string;
+  password_confirmation: string;
 }
 
 @Injectable({
@@ -72,28 +80,13 @@ export class AuthService {
     this.currentUser.set(user);
   }
 
-  register(data: Record<string, unknown>): Observable<unknown> {
-    return this.http.post(`${this.apiUrl}/register`, data);
-  }
-
-  verifyRegistrationCode(email: string, code: string): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/verify-registration`, { email, code }).pipe(
-      switchMap((response) => {
-        if (response.token) {
-          return this.handleAuthCallback(response.token);
-        }
-        return of(response);
-      })
-    );
-  }
-
   // --- Métodos de Recuperación de Contraseña ---
 
-  sendPasswordResetCode(email: string): Observable<unknown> {
+  requestPasswordReset(email: string): Observable<unknown> {
     return this.http.post(`${this.apiUrl}/forgot-password`, { email });
   }
 
-  resetPassword(data: Record<string, unknown>): Observable<unknown> {
+  resetPassword(data: PasswordResetRequest): Observable<unknown> {
     return this.http.post(`${this.apiUrl}/reset-password`, data);
   }
 
