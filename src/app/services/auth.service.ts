@@ -88,8 +88,21 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}/forgot-password`, { correo: email });
   }
 
+  verifyPasswordResetCode(email: string, code: string): Observable<unknown> {
+    return this.http.post(`${this.apiUrl}/verify-reset-code`, { correo: email, codigo: code });
+  }
+
   resetPassword(data: PasswordResetRequest): Observable<unknown> {
-    return this.http.post(`${this.apiUrl}/reset-password`, data);
+    return this.http.post<AuthResponse>(`${this.apiUrl}/reset-password`, data).pipe(
+      tap(response => {
+        const token = response.token || response.access_token;
+        const user = response.user || response.data;
+        if (token && user) {
+          this.setSession(token, user);
+          this.splashSubject.next();
+        }
+      })
+    );
   }
 
   loginWithGoogle(): void {

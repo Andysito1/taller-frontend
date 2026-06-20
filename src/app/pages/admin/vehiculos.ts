@@ -36,7 +36,7 @@ export class Vehiculos implements OnInit {
   public imageBaseUrl = environment.imageStorageUrl; // URL base para las imágenes
   public isEditing = signal(false);
   public currentVehiculoId = signal<number | null>(null);
-  public notifyingAutoReadyId = signal<number | null>(null);
+  public notifyingAutoReadyId: number | null = null;
   private selectedFile: File | null = null;
 
   // Formulario reactivo
@@ -234,12 +234,12 @@ export class Vehiculos implements OnInit {
     });
   }
 
-  notificarAutoListo(vehiculo: Vehiculo): void {
-    this.notifyingAutoReadyId.set(vehiculo.id);
+  public readonly notificarAutoListo = (vehiculo: Vehiculo): void => {
+    this.notifyingAutoReadyId = vehiculo.id;
 
     this.adminService.notifyCarReady(vehiculo.id).subscribe({
       next: () => {
-        this.notifyingAutoReadyId.set(null);
+        this.notifyingAutoReadyId = null;
         Swal.fire({
           title: 'Correo enviado',
           text: `Se notificó que el vehículo ${vehiculo.placa} está listo para entrega.`,
@@ -249,16 +249,14 @@ export class Vehiculos implements OnInit {
         this.loadVehiculos();
       },
       error: (err: HttpErrorResponse) => {
-        this.notifyingAutoReadyId.set(null);
+        this.notifyingAutoReadyId = null;
         const errorMsg = err.error?.message || err.message || 'No se pudo enviar la notificación de auto listo.';
         Swal.fire('Error', errorMsg, 'error');
       }
     });
-  }
+  };
 
-  isNotifyingAutoReady(id: number): boolean {
-    return this.notifyingAutoReadyId() === id;
-  }
+  public readonly isNotifyingAutoReady = (id: number): boolean => this.notifyingAutoReadyId === id;
 
   // Helper to get owner name safely
   getPropietarioNombre(vehiculo: Vehiculo): string {

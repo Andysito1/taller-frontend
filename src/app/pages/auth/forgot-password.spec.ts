@@ -41,7 +41,7 @@ describe('ForgotPassword', () => {
     component.requestReset();
 
     expect(authServiceMock.requestPasswordReset).toHaveBeenCalledWith('cliente@correo.com');
-    expect(navigateSpy).toHaveBeenCalledWith(['/restablecer'], { queryParams: { email: 'cliente@correo.com' } });
+    expect(navigateSpy).toHaveBeenCalledWith(['/verificar-codigo'], { queryParams: { email: 'cliente@correo.com' } });
   });
 
   it('accepts institutional .edu.pe emails', () => {

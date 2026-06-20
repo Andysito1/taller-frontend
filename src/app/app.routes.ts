@@ -20,6 +20,11 @@ export const routes: Routes = [
     canActivate: [PublicGuard]
   },
   {
+    path: 'verificar-codigo',
+    loadComponent: () => import('./pages/auth/verify-reset-code').then(m => m.VerifyResetCodeComponent),
+    canActivate: [PublicGuard]
+  },
+  {
     path: 'restablecer',
     loadComponent: () => import('./pages/auth/reset-password').then(m => m.ResetPasswordComponent),
     canActivate: [PublicGuard]

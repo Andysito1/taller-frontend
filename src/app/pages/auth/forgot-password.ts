@@ -89,7 +89,7 @@ export class ForgotPassword implements OnInit {
     this.authService.requestPasswordReset(email).subscribe({
       next: () => {
         this.isLoading.set(false);
-        this.router.navigate(['/restablecer'], {
+        this.router.navigate(['/verificar-codigo'], {
           queryParams: { email },
         });
       },

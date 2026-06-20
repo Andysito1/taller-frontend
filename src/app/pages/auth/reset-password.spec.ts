@@ -9,6 +9,7 @@ describe('ResetPasswordComponent', () => {
   let component: ResetPasswordComponent;
   const authServiceMock = {
     resetPassword: vi.fn().mockReturnValue(of({})),
+    userRole: vi.fn().mockReturnValue('CLIENTE'),
   } as unknown as AuthService;
 
   beforeEach(async () => {
@@ -43,8 +44,6 @@ describe('ResetPasswordComponent', () => {
     const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true as never);
 
     component.resetForm.patchValue({
-      correo: 'cliente@correo.com',
-      code: '123456',
       password: '12345678',
       password_confirmation: '12345678',
     });
@@ -60,6 +59,6 @@ describe('ResetPasswordComponent', () => {
       password: '12345678',
       password_confirmation: '12345678',
     });
-    expect(navigateSpy).toHaveBeenCalledWith(['/login'], { queryParams: { reset: 'success' } });
+    expect(navigateSpy).toHaveBeenCalledWith(['/cliente']);
   });
 });

@@ -13,8 +13,8 @@ import { resolveHttpErrorMessage } from '../../services/http-error-messages';
       <div class="auth-overlay"></div>
       <div class="login-card">
         <div class="brand-mark">Xtreme Performance</div>
-        <h2 class="auth-title">Restablecer contraseña</h2>
-        <p class="subtitle">Ingresa el código o token recibido por correo y define una nueva clave segura.</p>
+        <h2 class="auth-title">Nueva contrasena</h2>
+        <p class="subtitle">El codigo fue validado. Define tu nueva clave para entrar al sistema.</p>
 
         @if (errorMessage()) {
           <div class="error-message">{{ errorMessage() }}</div>
@@ -25,66 +25,44 @@ import { resolveHttpErrorMessage } from '../../services/http-error-messages';
         }
 
         <form class="auth-form" [formGroup]="resetForm" (ngSubmit)="submit()" novalidate>
-          <div class="form-field">
-            <label for="correo">Correo electrónico</label>
-            <input id="correo" type="email" formControlName="correo" placeholder="tu-correo@gmail.com" autocomplete="email" [class.invalid]="correo?.invalid && correo?.touched">
-            @if (correo?.hasError('required') && correo?.touched) {
-              <div class="form-field-error">El correo es obligatorio.</div>
+          <div class="form-field password-field">
+            <label for="password">Nueva contrasena</label>
+            <input id="password" [type]="passwordVisible() ? 'text' : 'password'" formControlName="password" placeholder="Minimo 6 caracteres" autocomplete="new-password" [class.invalid]="password?.invalid && password?.touched">
+            <button type="button" class="password-toggle-btn" (click)="togglePasswordVisibility()" aria-label="Mostrar u ocultar contrasena">
+              @if (passwordVisible()) { ocultar } @else { mostrar }
+            </button>
+            @if (password?.hasError('required') && password?.touched) {
+              <div class="form-field-error">La contrasena es obligatoria.</div>
             }
-            @if (correo?.hasError('email') && correo?.touched) {
-              <div class="form-field-error">Ingresa un correo válido.</div>
-            }
-          </div>
-
-          <div class="form-field">
-            <label for="code">Código o token de verificación</label>
-            <input id="code" type="text" formControlName="code" placeholder="123456 o token del enlace" autocomplete="one-time-code" [class.invalid]="code?.invalid && code?.touched">
-            @if (code?.hasError('required') && code?.touched) {
-              <div class="form-field-error">El código o token es obligatorio.</div>
-            }
-            @if (code?.hasError('minlength') && code?.touched) {
+            @if (password?.hasError('minlength') && password?.touched) {
               <div class="form-field-error">Debe tener al menos 6 caracteres.</div>
             }
           </div>
 
-          <div class="form-field password-field">
-            <label for="password">Nueva contraseña</label>
-            <input id="password" [type]="passwordVisible() ? 'text' : 'password'" formControlName="password" placeholder="Mínimo 8 caracteres" autocomplete="new-password" [class.invalid]="password?.invalid && password?.touched">
-            <button type="button" class="password-toggle-btn" (click)="togglePasswordVisibility()" aria-label="Mostrar u ocultar contraseña">
-              @if (passwordVisible()) { ocultar } @else { mostrar }
-            </button>
-            @if (password?.hasError('required') && password?.touched) {
-              <div class="form-field-error">La contraseña es obligatoria.</div>
-            }
-            @if (password?.hasError('minlength') && password?.touched) {
-              <div class="form-field-error">Debe tener al menos 8 caracteres.</div>
-            }
-          </div>
-
           <div class="form-field">
-            <label for="password_confirmation">Confirmar contraseña</label>
-            <input id="password_confirmation" type="password" formControlName="password_confirmation" placeholder="Repite la nueva contraseña" autocomplete="new-password" [class.invalid]="passwordConfirmation?.invalid && passwordConfirmation?.touched">
+            <label for="password_confirmation">Confirmar contrasena</label>
+            <input id="password_confirmation" type="password" formControlName="password_confirmation" placeholder="Repite la nueva contrasena" autocomplete="new-password" [class.invalid]="passwordConfirmation?.invalid && passwordConfirmation?.touched">
             @if (passwordConfirmation?.hasError('required') && passwordConfirmation?.touched) {
-              <div class="form-field-error">Confirma la contraseña.</div>
+              <div class="form-field-error">Confirma la contrasena.</div>
             }
             @if (resetForm.hasError('mismatch') && passwordConfirmation?.touched) {
-              <div class="form-field-error">Las contraseñas no coinciden.</div>
+              <div class="form-field-error">Las contrasenas no coinciden.</div>
             }
           </div>
 
           <button type="submit" class="primary-btn" [disabled]="isLoading()">
             @if (isLoading()) {
               <span class="spinner"></span>
-              Actualizando clave...
+              Actualizando...
             } @else {
-              Restablecer contraseña
+              Guardar y entrar
             }
           </button>
         </form>
 
         <div class="auth-footer">
-          <p class="footer-note">Si el código expiró, vuelve a solicitar recuperación desde el login.</p>
-          <a routerLink="/login" class="link-secondary">Volver al login</a>
+          <p class="footer-note">Correo validado: {{ email() || 'no indicado' }}</p>
+          <a routerLink="/recuperar" class="link-secondary">Solicitar otro codigo</a>
         </div>
       </div>
     </section>
@@ -113,36 +91,27 @@ export class ResetPasswordComponent implements OnInit {
   public readonly errorMessage = signal<string | null>(null);
   public readonly successMessage = signal<string | null>(null);
   public readonly passwordVisible = signal(false);
+  public readonly email = signal('');
+  public readonly code = signal('');
 
   public readonly resetForm = this.fb.nonNullable.group(
     {
-      correo: ['', [Validators.required, Validators.email]],
-      code: ['', [Validators.required, Validators.minLength(6)]],
-      password: ['', [Validators.required, Validators.minLength(8)]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
       password_confirmation: ['', [Validators.required]],
     },
     { validators: this.matchPasswords }
   );
 
   ngOnInit(): void {
-    const email = this.route.snapshot.queryParamMap.get('email');
-    const code = this.route.snapshot.queryParamMap.get('code') || this.route.snapshot.queryParamMap.get('token');
+    const email = this.route.snapshot.queryParamMap.get('email')?.trim().toLowerCase() ?? '';
+    const code = this.route.snapshot.queryParamMap.get('code')?.trim() ?? '';
 
-    if (email) {
-      this.resetForm.patchValue({ correo: email });
+    this.email.set(email);
+    this.code.set(code);
+
+    if (!email || !code) {
+      this.errorMessage.set('Primero valida el codigo enviado a tu correo.');
     }
-
-    if (code) {
-      this.resetForm.patchValue({ code });
-    }
-  }
-
-  get correo() {
-    return this.resetForm.get('correo');
-  }
-
-  get code() {
-    return this.resetForm.get('code');
   }
 
   get password() {
@@ -154,6 +123,11 @@ export class ResetPasswordComponent implements OnInit {
   }
 
   submit(): void {
+    if (!this.email() || !this.code()) {
+      this.router.navigate(['/recuperar']);
+      return;
+    }
+
     if (this.resetForm.invalid) {
       this.resetForm.markAllAsTouched();
       return;
@@ -163,22 +137,20 @@ export class ResetPasswordComponent implements OnInit {
     this.errorMessage.set(null);
 
     const rawValue = this.resetForm.getRawValue();
-    const correo = rawValue.correo.trim().toLowerCase();
-    const payload = {
-      correo,
-      email: correo,
-      codigo: rawValue.code.trim(),
-      code: rawValue.code.trim(),
-      token: rawValue.code.trim(),
+
+    this.authService.resetPassword({
+      correo: this.email(),
+      email: this.email(),
+      codigo: this.code(),
+      code: this.code(),
+      token: this.code(),
       password: rawValue.password,
       password_confirmation: rawValue.password_confirmation,
-    };
-
-    this.authService.resetPassword(payload).subscribe({
+    }).subscribe({
       next: () => {
         this.isLoading.set(false);
-        this.successMessage.set('Tu contraseña se actualizó correctamente. Redirigiendo al login...');
-        this.router.navigate(['/login'], { queryParams: { reset: 'success' } });
+        this.successMessage.set('Contrasena actualizada. Entrando al sistema...');
+        this.navigateByRole();
       },
       error: (error) => {
         this.isLoading.set(false);
@@ -189,5 +161,21 @@ export class ResetPasswordComponent implements OnInit {
 
   togglePasswordVisibility(): void {
     this.passwordVisible.update((visible) => !visible);
+  }
+
+  private navigateByRole(): void {
+    const role = this.authService.userRole();
+
+    if (role === 'ADMIN') {
+      this.router.navigate(['/admin']);
+      return;
+    }
+
+    if (role === 'MECANICO') {
+      this.router.navigate(['/mecanico']);
+      return;
+    }
+
+    this.router.navigate(['/cliente']);
   }
 }
