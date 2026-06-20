@@ -43,4 +43,11 @@ describe('ForgotPassword', () => {
     expect(authServiceMock.requestPasswordReset).toHaveBeenCalledWith('cliente@correo.com');
     expect(navigateSpy).toHaveBeenCalledWith(['/restablecer'], { queryParams: { email: 'cliente@correo.com' } });
   });
+
+  it('accepts institutional .edu.pe emails', () => {
+    component.requestForm.patchValue({ correo: 'alumno@continental.edu.pe' });
+    component.requestReset();
+
+    expect(authServiceMock.requestPasswordReset).toHaveBeenCalledWith('alumno@continental.edu.pe');
+  });
 });

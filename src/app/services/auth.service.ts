@@ -15,7 +15,8 @@ interface AuthResponse {
 }
 
 export interface PasswordResetRequest {
-  email: string;
+  correo: string;
+  email?: string;
   code?: string;
   token?: string;
   password: string;
@@ -83,7 +84,7 @@ export class AuthService {
   // --- Métodos de Recuperación de Contraseña ---
 
   requestPasswordReset(email: string): Observable<unknown> {
-    return this.http.post(`${this.apiUrl}/forgot-password`, { email });
+    return this.http.post(`${this.apiUrl}/forgot-password`, { correo: email });
   }
 
   resetPassword(data: PasswordResetRequest): Observable<unknown> {

@@ -52,6 +52,7 @@ describe('ResetPasswordComponent', () => {
     component.submit();
 
     expect(authServiceMock.resetPassword).toHaveBeenCalledWith({
+      correo: 'cliente@correo.com',
       email: 'cliente@correo.com',
       code: '123456',
       token: '123456',

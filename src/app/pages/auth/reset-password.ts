@@ -163,8 +163,10 @@ export class ResetPasswordComponent implements OnInit {
     this.errorMessage.set(null);
 
     const rawValue = this.resetForm.getRawValue();
+    const correo = rawValue.correo.trim().toLowerCase();
     const payload = {
-      email: rawValue.correo.trim().toLowerCase(),
+      correo,
+      email: correo,
       code: rawValue.code.trim(),
       token: rawValue.code.trim(),
       password: rawValue.password,
