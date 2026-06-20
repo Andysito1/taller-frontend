@@ -73,7 +73,7 @@ export function resolveHttpErrorMessage(error: unknown, context: HttpErrorContex
   }
 
   if (error.status >= 500) {
-    return messages.server;
+    return backendMessage || messages.server;
   }
 
   return backendMessage || messages.generic;

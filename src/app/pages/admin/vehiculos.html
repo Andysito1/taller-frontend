@@ -147,6 +147,13 @@
                       <button type="button" class="btn btn-sm btn-outline-primary" (click)="editVehiculo(vehiculo)">
                         <i class="bi bi-pencil"></i> Editar
                       </button>
+                      <button type="button" class="btn btn-sm btn-outline-success" (click)="notificarAutoListo(vehiculo)" [disabled]="isNotifyingAutoReady(vehiculo.id)">
+                        @if (isNotifyingAutoReady(vehiculo.id)) {
+                          Enviando...
+                        } @else {
+                          Auto listo
+                        }
+                      </button>
                       <button type="button" class="btn btn-sm btn-outline-danger" (click)="deleteVehiculo(vehiculo.id)">
                         <i class="bi bi-trash"></i> Borrar
                       </button>

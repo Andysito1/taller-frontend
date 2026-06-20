@@ -119,10 +119,14 @@ export class AdminService {
   }
 
   sendCustomerReminder(id: number, template: 'suave' | 'persuasiva', message?: string): Observable<unknown> {
-    return this.http.post(`${this.apiUrl}/clientes/${id}/recordatorio-correo`, {
+    return this.http.post(`${this.apiUrl}/clientes/${id}/recordatorio-marketing`, {
       template,
       mensaje: message,
     });
+  }
+
+  notifyCarReady(id: number): Observable<unknown> {
+    return this.http.post(`${this.apiUrl}/vehiculos/${id}/notificar-auto-listo`, {});
   }
 
   updateVehiculo(id: number, data: FormData): Observable<any> {
