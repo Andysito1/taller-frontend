@@ -167,6 +167,7 @@ export class ResetPasswordComponent implements OnInit {
     const payload = {
       correo,
       email: correo,
+      codigo: rawValue.code.trim(),
       code: rawValue.code.trim(),
       token: rawValue.code.trim(),
       password: rawValue.password,

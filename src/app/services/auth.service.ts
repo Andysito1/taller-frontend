@@ -17,6 +17,7 @@ interface AuthResponse {
 export interface PasswordResetRequest {
   correo: string;
   email?: string;
+  codigo?: string;
   code?: string;
   token?: string;
   password: string;
