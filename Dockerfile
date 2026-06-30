@@ -1,23 +1,35 @@
-# Etapa 1: Compilar la aplicación con Node.js
-FROM node:18-alpine AS build
+# Paso 1: Compilar la aplicación Angular
+FROM node:20-alpine AS build
 WORKDIR /app
 
-# Copiar archivos de dependencias e instalarlos
+# Copiar archivos de dependencias e instalar
 COPY package*.json ./
 RUN npm install
 
-# Copiar todo el código del proyecto y compilarlo para producción
+# Copiar el resto del código del proyecto
 COPY . .
-RUN npm run build -- --configuration=production
 
-# Etapa 2: Servir la aplicación con Nginx
+# Compilar el proyecto en modo producción
+RUN npm run build -- --configuration production
+
+# Paso 2: Servir la aplicación con Nginx
 FROM nginx:alpine
 
-# Copiar los archivos compilados desde la etapa 'build' a la carpeta pública de Nginx
-# ¡Ojo aquí! Cambia 'nombre-de-tu-proyecto' por el nombre real de tu carpeta en Angular
-COPY --from=build /app/dist/nombre-de-tu-proyecto/browser /usr/share/nginx/html/
+# Copiar los archivos compilados desde el paso anterior a Nginx
+# Cloud Run necesita que apuntemos exactamente a la ruta de salida
+COPY --from=build /app/dist/Crud_Angular/browser /usr/share/nginx/html
 
-# Exponer el puerto 80 que usa Nginx por defecto internamente
-EXPOSE 80
+# Configuración de Nginx adaptada para el puerto 8080 de Cloud Run y rutas de Angular (SPA)
+RUN echo 'server { \
+    listen 8080; \
+    location / { \
+        root /usr/share/nginx/html; \
+        index index.html index.htm; \
+        try_files $uri $uri/ /index.html; \
+    } \
+}' > /etc/nginx/conf.d/default.conf
+
+# Exponer el puerto requerido por Google Cloud Run
+EXPOSE 8080
 
 CMD ["nginx", "-g", "daemon off;"]
