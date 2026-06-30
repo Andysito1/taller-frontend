@@ -4,12 +4,11 @@ import { RouterOutlet, RouterLink } from '@angular/router';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { AuthService } from './services/auth.service';
 import { PushNotificationService } from './services/push-notification.service';
-import { ButtonDarkToggleComponent } from './shared/components/button-dark-toggle/button-dark-toggle-component';
 import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, CommonModule, NgOptimizedImage, ButtonDarkToggleComponent],
+  imports: [RouterOutlet, RouterLink, CommonModule, NgOptimizedImage],
   templateUrl: './app.html',
   styleUrls: ['./app.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

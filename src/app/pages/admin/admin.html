@@ -2,9 +2,15 @@
 <div class="admin-panel">
   <aside class="sidebar">
     <div class="sidebar-header">
-      <div class="d-flex align-items-center gap-2">
-        <i class="bi bi-shield-lock-fill fs-4 text-primary"></i>
-        <h3 class="h5 mb-0">Panel de Control</h3>
+      <div class="d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-shield-lock-fill fs-4 text-primary"></i>
+          <h3 class="h5 mb-0">Panel de Control</h3>
+        </div>
+        <app-button-dark-toggle 
+          [isDarkMode]="isDarkMode()" 
+          (toggleDarkMode)="toggleDarkMode()">
+        </app-button-dark-toggle>
       </div>
     </div>
     <nav class="sidebar-nav">

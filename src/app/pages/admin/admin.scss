@@ -33,16 +33,23 @@
 }
 
 .sidebar-header {
-  padding: 25px 20px;
-  text-align: center;
+  padding: 20px 15px;
   border-bottom: 2px solid var(--brand-red);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
 
   h3 {
     margin: 0;
-    font-size: 1.6em;
+    font-size: 1.4em;
     color: var(--brand-red);
     font-weight: 700;
     letter-spacing: 1px;
+  }
+
+  .switch {
+    flex-shrink: 0;
   }
 }
 
