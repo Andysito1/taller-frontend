@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AdminService } from '../../services/admin.service';
 import { Cliente } from '../models/cliente.model';
+import { OrdenServicio } from '../models/orden-servicio.model';
 import { resolveHttpErrorMessage } from '../../services/http-error-messages';
 
 type ReminderTemplate = 'suave' | 'persuasiva';
@@ -34,7 +35,9 @@ export class Recordatorios implements OnInit {
   ];
 
   readonly clients = signal<Cliente[]>([]);
+  readonly finalizedOrders = signal<OrdenServicio[]>([]);
   readonly loading = signal(false);
+  readonly completedServiceLoading = signal<number | null>(null);
   readonly error = signal<string | null>(null);
   readonly success = signal<string | null>(null);
 
@@ -47,6 +50,7 @@ export class Recordatorios implements OnInit {
 
   ngOnInit(): void {
     this.loadClients();
+    this.loadFinalizedOrders();
   }
 
   loadClients(): void {
@@ -61,6 +65,19 @@ export class Recordatorios implements OnInit {
       error: (error) => {
         this.loading.set(false);
         this.error.set(resolveHttpErrorMessage(error, 'recordatorio-correo'));
+      },
+    });
+  }
+
+  loadFinalizedOrders(): void {
+    this.adminService.getOrdenes().subscribe({
+      next: (orders) => {
+        this.finalizedOrders.set(
+          orders.filter((order) => order.estado === 'finalizado' && order.vehiculo?.cliente?.usuario)
+        );
+      },
+      error: (error) => {
+        this.error.set(resolveHttpErrorMessage(error, 'ordenes-servicio'));
       },
     });
   }
@@ -95,6 +112,30 @@ export class Recordatorios implements OnInit {
       error: (error) => {
         this.loading.set(false);
         this.error.set(resolveHttpErrorMessage(error, 'recordatorio-correo'));
+      },
+    });
+  }
+
+  sendCompletedService(order: { id: number; order_id?: number } | Cliente): void {
+    const orderId = (order as { order_id?: number }).order_id ?? order.id;
+
+    if (!orderId) {
+      this.error.set('No se pudo identificar la orden para enviar el correo.');
+      return;
+    }
+
+    this.error.set(null);
+    this.success.set(null);
+    this.completedServiceLoading.set(orderId);
+
+    this.adminService.sendCompletedService(orderId).subscribe({
+      next: () => {
+        this.completedServiceLoading.set(null);
+        this.success.set('El correo de servicio completado fue enviado correctamente.');
+      },
+      error: (error) => {
+        this.completedServiceLoading.set(null);
+        this.error.set(resolveHttpErrorMessage(error, 'servicio-completado'));
       },
     });
   }

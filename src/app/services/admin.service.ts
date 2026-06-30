@@ -96,6 +96,10 @@ export class AdminService {
     );
   }
 
+  sendCompletedService(id: number): Observable<unknown> {
+    return this.http.post(`${this.apiUrl}/ordenes/${id}/notificar-servicio-completado`, {});
+  }
+
   consultarDocumento(id_tipo_documento: number, numero: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/consulta-documento`, { id_tipo_documento, numero });
   }

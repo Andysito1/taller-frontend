@@ -11,7 +11,9 @@ describe('Recordatorios', () => {
     getClientes: vi.fn().mockReturnValue(of([
       { id: 1, usuario: { nombre: 'Cliente Demo', correo: 'cliente@correo.com', activo: true } },
     ])),
+    getOrdenes: vi.fn().mockReturnValue(of([])),
     sendCustomerReminder: vi.fn().mockReturnValue(of({})),
+    sendCompletedService: vi.fn().mockReturnValue(of({})),
   } as unknown as AdminService;
 
   beforeEach(async () => {
@@ -38,5 +40,11 @@ describe('Recordatorios', () => {
       'persuasiva',
       'Los mecánicos extrañan tu auto. ¿No querrás arreglar algo? ¡Ven a Xtreme Performance y deja tu vehículo en manos expertas!'
     );
+  });
+
+  it('sends the completed service email for an already finalized order', () => {
+    component.sendCompletedService({ id: 99, usuario: { nombre: 'Cliente Demo', correo: 'cliente@correo.com' } } as any);
+
+    expect(adminServiceMock.sendCompletedService).toHaveBeenCalledWith(99);
   });
 });

@@ -50,6 +50,62 @@
   font-size: 1.2rem;
 }
 
+.section-header {
+  .section-text {
+    color: var(--text-secondary);
+    margin: 0.25rem 0 0;
+    font-size: 0.95rem;
+  }
+}
+
+.completed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.completed-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-primary);
+}
+
+.completed-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+
+  strong {
+    color: var(--text-primary);
+    font-size: 0.98rem;
+  }
+
+  span {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+  }
+}
+
+.completed-action-btn {
+  white-space: nowrap;
+  min-width: 150px;
+}
+
+.empty-state {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 1rem;
+  border-radius: 10px;
+  background: rgba(220, 38, 38, 0.06);
+  color: var(--text-secondary);
+}
+
 .reminder-form {
   display: flex;
   flex-direction: column;

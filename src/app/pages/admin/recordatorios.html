@@ -70,4 +70,43 @@
       }
     </div>
   </div>
+
+  <div class="reminder-card mt-4">
+    <div class="card-body">
+      <div class="section-header mb-3">
+        <h5 class="card-title">Servicio Completado</h5>
+        <p class="section-text">Envía el aviso solo a clientes con órdenes ya finalizadas.</p>
+      </div>
+
+      @if (finalizedOrders().length) {
+        <div class="completed-list">
+          @for (order of finalizedOrders(); track order.id) {
+            <div class="completed-item">
+              <div class="completed-main">
+                <strong>{{ order.vehiculo?.cliente?.usuario?.nombre || 'Cliente sin nombre' }}</strong>
+                <span>{{ order.vehiculo?.placa || 'Sin placa' }} • {{ order.titulo || 'Orden de servicio' }}</span>
+              </div>
+              <button
+                type="button"
+                class="btn btn-danger completed-action-btn"
+                [disabled]="completedServiceLoading() === order.id"
+                (click)="sendCompletedService(order)"
+              >
+                @if (completedServiceLoading() === order.id) {
+                  <span>Enviando...</span>
+                } @else {
+                  <i class="bi bi-envelope-check"></i> Enviar correo
+                }
+              </button>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="empty-state">
+          <i class="bi bi-info-circle"></i>
+          <span>No hay órdenes finalizadas para notificar en este momento.</span>
+        </div>
+      }
+    </div>
+  </div>
 </div>

@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 
-export type HttpErrorContext = 'login' | 'forgot-password' | 'reset-password' | 'recordatorio-correo';
+export type HttpErrorContext = 'login' | 'forgot-password' | 'reset-password' | 'recordatorio-correo' | 'ordenes-servicio' | 'servicio-completado';
 
 type ContextMessages = {
   validation: string;
@@ -43,6 +43,22 @@ const MESSAGES: Record<HttpErrorContext, ContextMessages> = {
     inactive: 'El cliente no está activo para recibir recordatorios.',
     server: 'No se pudo enviar el recordatorio en este momento.',
     generic: 'No se pudo enviar el recordatorio. Intenta más tarde.',
+  },
+  'ordenes-servicio': {
+    validation: 'No se pudieron cargar las órdenes disponibles.',
+    badRequest: 'No se pudieron cargar las órdenes disponibles.',
+    notFound: 'No se encontraron órdenes disponibles.',
+    inactive: 'No hay órdenes disponibles para este momento.',
+    server: 'No se pudieron cargar las órdenes en este momento.',
+    generic: 'No se pudieron cargar las órdenes.',
+  },
+  'servicio-completado': {
+    validation: 'Solo se pueden enviar correos para órdenes ya finalizadas.',
+    badRequest: 'No se pudo enviar el correo de servicio completado.',
+    notFound: 'No se encontró la orden especificada.',
+    inactive: 'La orden no está disponible para esta acción.',
+    server: 'No se pudo enviar el correo de servicio completado en este momento.',
+    generic: 'No se pudo enviar el correo de servicio completado.',
   },
 };
 
