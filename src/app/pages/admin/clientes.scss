@@ -23,14 +23,21 @@
 }
 
 .reminder-card {
-  background: linear-gradient(135deg, rgba(220, 38, 38, 0.1), rgba(15, 20, 25, 0.8));
+  background: linear-gradient(135deg, rgba(220, 38, 38, 0.08), rgba(15, 20, 25, 0.5));
   border: 2px solid rgba(220, 38, 38, 0.3);
   border-radius: 12px;
   transition: all 0.3s ease;
 
   &:hover {
     border-color: var(--brand-red);
-    background: linear-gradient(135deg, rgba(220, 38, 38, 0.15), rgba(15, 20, 25, 0.9));
+    background: linear-gradient(135deg, rgba(220, 38, 38, 0.12), rgba(15, 20, 25, 0.6));
     box-shadow: 0 8px 16px rgba(220, 38, 38, 0.2);
   }
+}
+
+.reminder-text {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin: 0;
+  font-weight: 500;
 }
