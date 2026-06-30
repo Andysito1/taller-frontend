@@ -1,3 +1,5 @@
+@import '../../_color-variables.scss';
+
 .reports-container {
   max-width: 1000px;
   margin: 0 auto;
@@ -5,24 +7,26 @@
   .header {
     margin-bottom: 2rem;
     h2 {
-      color: #1e293b;
+      color: var(--text-primary);
       font-size: 1.875rem;
       font-weight: 700;
       margin-bottom: 0.5rem;
       display: flex;
       align-items: center;
       gap: 0.75rem;
+      border-bottom: 3px solid var(--brand-red);
+      padding-bottom: 10px;
     }
     p {
-      color: #64748b;
+      color: var(--text-secondary);
       font-size: 1rem;
     }
   }
 
   .report-card {
-    background: #ffffff;
+    background: var(--bg-secondary);
     border-radius: 12px;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.1);
     padding: 2rem;
     border: 1px solid #e2e8f0;
 

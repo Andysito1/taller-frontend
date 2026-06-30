@@ -1,3 +1,4 @@
+@import '../../_color-variables.scss';
 
 .page-header {
   display: flex;
@@ -6,25 +7,28 @@
   margin-bottom: 20px;
 
   h2 {
-    color: #1e293b;
+    color: var(--text-primary);
     font-size: 1.875rem;
     font-weight: 700;
     margin-bottom: 0.5rem;
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    border-bottom: 3px solid var(--brand-red);
+    padding-bottom: 10px;
   }
   p {
-    color: #64748b;
+    color: var(--text-secondary);
     font-size: 1rem;
   }
 }
 
 .form-container {
-  background: #fff;
+  background: var(--bg-secondary);
   padding: 20px;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.1);
+  border: 1px solid var(--border);
   margin-bottom: 20px;
 
   h3 {

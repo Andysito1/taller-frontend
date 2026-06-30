@@ -1,3 +1,4 @@
+@import 'app/_color-variables.scss';
 
 /* RESET GLOBAL */
 * {
@@ -9,21 +10,41 @@
 /* Smooth scroll for in-page anchors */
 html {
   scroll-behavior: smooth;
+  @include light-theme;
+
+  &.dark {
+    @include dark-theme;
+  }
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  line-height: 1.6;
 }
 
 /* SECTIONS */
 .section {
   min-height: 100vh;
   padding: 120px 60px 60px;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease;
+
+  &.gray {
+    background-color: var(--bg-secondary);
+  }
 }
 
 .gray {
-  background-color: #f4f4f4;
+  background-color: var(--bg-tertiary);
 }
 
 .hero {
-  background-color: #111;
-  color: white;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -33,11 +54,35 @@ html {
 h1 {
   font-size: 48px;
   margin-bottom: 20px;
+  color: var(--text-primary);
+  font-weight: 700;
 }
 
 h2 {
   font-size: 36px;
   margin-bottom: 20px;
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+h3 {
+  font-size: 28px;
+  margin-bottom: 15px;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+h4 {
+  font-size: 22px;
+  margin-bottom: 12px;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+p {
+  color: var(--text-secondary);
+  font-size: 16px;
+  line-height: 1.8;
 }
 
 /* AUTH SECTIONS */
@@ -47,6 +92,102 @@ h2 {
   display: flex;
   flex-direction: column;
   align-items: center;
+  background-color: var(--bg-primary);
+}
+
+/* BOTONES GENÉRICOS */
+button {
+  font-family: inherit;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+/* ENLACES */
+a {
+  color: var(--brand-red);
+  text-decoration: none;
+  transition: all 0.3s ease;
+
+  &:hover {
+    color: var(--brand-red-light);
+  }
+}
+
+/* INPUTS Y FORMULARIOS */
+input,
+textarea,
+select {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-family: inherit;
+  transition: all 0.3s ease;
+
+  &:focus {
+    outline: none;
+    border-color: var(--brand-red);
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+  }
+
+  &::placeholder {
+    color: var(--text-tertiary);
+  }
+}
+
+/* TABLAS */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--bg-secondary);
+
+  thead {
+    background-color: var(--bg-tertiary);
+    border-bottom: 2px solid var(--brand-red);
+  }
+
+  th {
+    padding: 12px;
+    text-align: left;
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  td {
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-secondary);
+  }
+
+  tbody tr {
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: var(--bg-tertiary);
+    }
+  }
+}
+
+/* SCROLL */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--brand-red);
+  border-radius: 5px;
+
+  &:hover {
+    background: var(--brand-red-light);
+  }
 }
 
 .auth-form {

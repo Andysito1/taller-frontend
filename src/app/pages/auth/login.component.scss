@@ -1,13 +1,15 @@
+@import '../../_color-variables.scss';
+
 :host {
-  --bg: #060608;
-  --bg-soft: #111114;
-  --panel: rgba(17, 17, 20, 0.9);
-  --panel-border: rgba(239, 68, 68, 0.25);
-  --text: #f5f5f5;
-  --muted: #b8b8be;
-  --accent: #ef4444;
-  --accent-strong: #b91c1c;
-  --danger: #f87171;
+  --bg: var(--bg-primary);
+  --bg-soft: var(--bg-secondary);
+  --panel: rgba(26, 31, 46, 0.95);
+  --panel-border: rgba(220, 38, 38, 0.3);
+  --text: var(--text-primary);
+  --muted: var(--text-tertiary);
+  --accent: var(--brand-red);
+  --accent-strong: #991b1b;
+  --danger: #ef4444;
   font-family: 'Inter', sans-serif;
   color: var(--text);
 }
@@ -18,18 +20,19 @@
   min-height: 100vh;
   width: 100%;
   background:
-    radial-gradient(circle at top, rgba(239, 68, 68, 0.15), transparent 34%),
-    radial-gradient(circle at bottom right, rgba(255, 255, 255, 0.06), transparent 26%),
-    linear-gradient(135deg, #050505 0%, #0f1013 48%, #1a0d0d 100%);
+    radial-gradient(circle at top, rgba(220, 38, 38, 0.2), transparent 34%),
+    radial-gradient(circle at bottom right, rgba(59, 130, 246, 0.1), transparent 26%),
+    linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 48%, rgba(127, 29, 29, 0.1) 100%);
   position: relative;
   overflow: hidden;
   padding: 2rem 1rem;
+  transition: background 0.3s ease;
 }
 
 .auth-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6));
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.4));
   z-index: 1;
 }
 
@@ -41,9 +44,15 @@
   border-radius: 24px;
   background: var(--panel);
   border: 1px solid var(--panel-border);
-  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.55);
+  box-shadow: 0 28px 70px rgba(220, 38, 38, 0.2), 0 0 40px rgba(220, 38, 38, 0.1);
   backdrop-filter: blur(18px);
   animation: fadeInScale 0.45s ease-out both;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: var(--accent);
+    box-shadow: 0 28px 70px rgba(220, 38, 38, 0.3), 0 0 50px rgba(220, 38, 38, 0.15);
+  }
 }
 
 @keyframes fadeInScale {

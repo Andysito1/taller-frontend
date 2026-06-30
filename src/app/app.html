@@ -23,13 +23,25 @@
           <a routerLink="/" fragment="servicios">Servicios</a>
           <a routerLink="/" fragment="porque">¿Por qué elegirnos?</a>
           <a routerLink="/" fragment="contacto">Contáctenos</a>
-          <a routerLink="/login" class="login-btn">Iniciar sesión</a>
+          <div class="nav-right">
+            <app-button-dark-toggle 
+              [isDarkMode]="isDarkMode()" 
+              (toggleDarkMode)="toggleDarkMode()">
+            </app-button-dark-toggle>
+            <a routerLink="/login" class="login-btn">Iniciar sesión</a>
+          </div>
         </nav>
       } @else {
         <nav class="nav">
           <span class="welcome-text">Hola, <strong>{{ userName() }}</strong></span>
           <a routerLink="/cliente" routerLinkActive="active-link">Mi Garaje</a>
-          <button (click)="logout()" class="logout-btn">Cerrar Sesión</button>
+          <div class="nav-right">
+            <app-button-dark-toggle 
+              [isDarkMode]="isDarkMode()" 
+              (toggleDarkMode)="toggleDarkMode()">
+            </app-button-dark-toggle>
+            <button (click)="logout()" class="logout-btn">Cerrar Sesión</button>
+          </div>
         </nav>
       }
       </header>

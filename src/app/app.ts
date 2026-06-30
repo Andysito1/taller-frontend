@@ -4,11 +4,12 @@ import { RouterOutlet, RouterLink } from '@angular/router';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { AuthService } from './services/auth.service';
 import { PushNotificationService } from './services/push-notification.service';
+import { ButtonDarkToggleComponent } from './shared/components/button-dark-toggle/button-dark-toggle-component';
 import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, CommonModule, NgOptimizedImage],
+  imports: [RouterOutlet, RouterLink, CommonModule, NgOptimizedImage, ButtonDarkToggleComponent],
   templateUrl: './app.html',
   styleUrls: ['./app.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -21,6 +22,7 @@ export class App implements OnInit, OnDestroy {
   protected readonly title = signal('taller');
   public isLoading = signal(true);
   public isFading = signal(false);
+  public isDarkMode = signal(false);
   
   // Conexión directa a los Signals del servicio (limpio y reactivo)
   public isAuthenticated = this.authService.isAuthenticated;
@@ -38,6 +40,19 @@ export class App implements OnInit, OnDestroy {
   constructor() {}
 
   ngOnInit(): void {
+    // Cargar preferencia de dark mode desde localStorage
+    if (isPlatformBrowser(this.platformId)) {
+      const savedDarkMode = localStorage.getItem('darkMode');
+      if (savedDarkMode !== null) {
+        this.isDarkMode.set(savedDarkMode === 'true');
+      } else {
+        // Detectar preferencia del sistema
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        this.isDarkMode.set(prefersDark);
+      }
+      this.applyTheme(this.isDarkMode());
+    }
+    
     // Suscribirse para mostrar animación al iniciar sesión
     if (isPlatformBrowser(this.platformId)) {
     
@@ -85,5 +100,25 @@ export class App implements OnInit, OnDestroy {
 
   logout(): void {
     this.authService.logout();
+  }
+
+  toggleDarkMode(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    
+    const newValue = !this.isDarkMode();
+    this.isDarkMode.set(newValue);
+    this.applyTheme(newValue);
+    localStorage.setItem('darkMode', String(newValue));
+  }
+
+  private applyTheme(isDark: boolean): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    
+    const htmlElement = document.documentElement;
+    if (isDark) {
+      htmlElement.classList.add('dark');
+    } else {
+      htmlElement.classList.remove('dark');
+    }
   }
 }

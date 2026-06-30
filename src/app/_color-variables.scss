@@ -1,0 +1,94 @@
+// ====================================================
+// PALETA DE COLORES GLOBAL - TEORÍA DEL COLOR
+// Colores Corporativos: Rojo y Negro (No tan oscuro)
+// ====================================================
+
+// ---- COLORES LIGHT MODE ----
+$light-bg-primary: #ffffff;
+$light-bg-secondary: #f9fafb;
+$light-bg-tertiary: #f3f4f6;
+$light-text-primary: #1a1a1a;
+$light-text-secondary: #4b5563;
+$light-text-tertiary: #9ca3af;
+$light-border: #e5e7eb;
+
+// ---- COLORES DARK MODE ----
+$dark-bg-primary: #0f1419;
+$dark-bg-secondary: #1a1f2e;
+$dark-bg-tertiary: #232d3f;
+$dark-text-primary: #f9fafb;
+$dark-text-secondary: #d1d5db;
+$dark-text-tertiary: #9ca3af;
+$dark-border: #374151;
+
+// ---- COLORES CORPORATIVOS ----
+$brand-red: #dc2626;
+$brand-red-dark: #7f1d1d;
+$brand-red-light: #ef4444;
+$brand-red-lighter: #fca5a5;
+$brand-black: #1a1a1a;
+
+// ---- COLORES SECUNDARIOS (COMBINACIÓN TEORÍA DEL COLOR) ----
+$accent-blue: #0ea5e9;
+$accent-amber: #f59e0b;
+$accent-green: #10b981;
+$accent-red: $brand-red;
+
+// ---- ESTADOS ----
+$success: #10b981;
+$warning: #f59e0b;
+$danger: #ef4444;
+$info: #3b82f6;
+
+// ---- SOMBRAS ----
+$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+$shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+// ---- TRANSICIONES ----
+$transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+$transition-fast: all 0.15s ease-in-out;
+
+// ---- MIXIN PARA TEMA ----
+@mixin light-theme {
+  --bg-primary: #{$light-bg-primary};
+  --bg-secondary: #{$light-bg-secondary};
+  --bg-tertiary: #{$light-bg-tertiary};
+  --text-primary: #{$light-text-primary};
+  --text-secondary: #{$light-text-secondary};
+  --text-tertiary: #{$light-text-tertiary};
+  --border: #{$light-border};
+  --brand-red: #{$brand-red};
+  --accent-blue: #{$accent-blue};
+}
+
+@mixin dark-theme {
+  --bg-primary: #{$dark-bg-primary};
+  --bg-secondary: #{$dark-bg-secondary};
+  --bg-tertiary: #{$dark-bg-tertiary};
+  --text-primary: #{$dark-text-primary};
+  --text-secondary: #{$dark-text-secondary};
+  --text-tertiary: #{$dark-text-tertiary};
+  --border: #{$dark-border};
+  --brand-red: #{$brand-red-light};
+  --accent-blue: #{$accent-blue};
+}
+
+// ---- CLASE PARA DETECTAR DARK MODE ----
+:root {
+  @include light-theme;
+}
+
+:root.dark {
+  @include dark-theme;
+}
+
+// ---- APLICAR A HTML TAMBIÉN ----
+html {
+  @include light-theme;
+
+  &.dark {
+    @include dark-theme;
+  }
+}

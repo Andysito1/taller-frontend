@@ -1,3 +1,5 @@
+@import '../../_color-variables.scss';
+
 :host {
   display: block;
   height: 100vh;
@@ -5,23 +7,24 @@
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 1050; // Superpone el layout al navbar global
+  z-index: 1050;
   overflow: hidden;
-  background-color: #f4f7fa;
+  background-color: var(--bg-primary);
+  transition: background-color 0.3s ease;
 
-  --primary-color: #e74c3c;
-  --primary-color-dark: #c0392b;
-  --background-color: #f4f7fa;
-  --card-background: #ffffff;
-  --text-dark: #2c3e50;
-  --text-light: #7f8c8d;
-  --border-color: #e0e0e0;
+  --primary-color: var(--brand-red);
+  --primary-color-dark: #991b1b;
+  --background-color: var(--bg-primary);
+  --card-background: var(--bg-secondary);
+  --text-dark: var(--text-primary);
+  --text-light: var(--text-secondary);
+  --border-color: var(--border);
 
   // Status colors
-  --status-en-proceso: #3498db;
-  --status-pendiente: #f1c40f;
-  --status-completado: #2ecc71;
-  --status-cancelado: #95a5a6;
+  --status-en-proceso: #3b82f6;
+  --status-pendiente: #f59e0b;
+  --status-completado: #10b981;
+  --status-cancelado: #6b7280;
 }
 
 .dashboard-container {
@@ -36,8 +39,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid var(--border-color);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  border-bottom: 2px solid var(--primary-color);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.1);
+  transition: all 0.3s ease;
 
   h1 {
     margin: 0;
