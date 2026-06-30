@@ -1,0 +1,73 @@
+<div class="reminders-container">
+  <div class="header">
+    <h2>📧 Recordatorios por Correo</h2>
+    <p>Selecciona un cliente y envía un mensaje de seguimiento con un tono suave o más persuasivo.</p>
+  </div>
+
+  <div class="reminder-card">
+    <div class="card-body">
+      <h5 class="card-title mb-3">Enviar Recordatorio</h5>
+      
+      <form [formGroup]="reminderForm" (ngSubmit)="sendReminder()" class="reminder-form">
+        <div class="form-group">
+          <label for="cliente_id" class="form-label">Seleccionar Cliente</label>
+          <select id="cliente_id" formControlName="cliente_id" class="form-select">
+            <option value="">Elige un cliente...</option>
+            @for (cliente of clientes(); track cliente.id) {
+              <option [value]="cliente.id">{{ cliente.usuario.nombre || 'Cliente sin nombre' }} - {{ cliente.usuario.correo || 'sin correo' }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Plantilla de Mensaje</label>
+          <div class="template-buttons">
+            @for (template of templates; track template.id) {
+              <button 
+                type="button" 
+                class="template-btn" 
+                [class.active]="reminderForm.value.template === template.id"
+                (click)="reminderForm.patchValue({ template: template.id })"
+              >
+                <strong>{{ template.title }}</strong>
+                <span class="template-desc">{{ template.description }}</span>
+              </button>
+            }
+          </div>
+        </div>
+
+        <div class="preview-section">
+          <h6>Vista Previa</h6>
+          <div class="preview-box">
+            <p class="preview-label">{{ selectedTemplateLabel() }}</p>
+            <p class="preview-text">{{ selectedTemplateMessage() }}</p>
+          </div>
+        </div>
+
+        <button 
+          type="submit" 
+          class="btn btn-danger btn-lg w-100"
+          [disabled]="loading() || reminderForm.invalid"
+        >
+          @if (loading()) {
+            <span>Enviando...</span>
+          } @else {
+            <i class="bi bi-send"></i> Enviar Recordatorio
+          }
+        </button>
+      </form>
+
+      @if (error()) {
+        <div class="alert alert-danger mt-3" role="alert">
+          <i class="bi bi-exclamation-circle"></i> {{ error() }}
+        </div>
+      }
+
+      @if (success()) {
+        <div class="alert alert-success mt-3" role="alert">
+          <i class="bi bi-check-circle"></i> {{ success() }}
+        </div>
+      }
+    </div>
+  </div>
+</div>
