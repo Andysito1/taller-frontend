@@ -81,6 +81,45 @@
   </div>
 </section>
 
+<button class="chat-toggle" type="button" (click)="toggleChat()" aria-label="Abrir asistente virtual">
+  <span>💬</span>
+</button>
+
+@if (isChatOpen()) {
+  <div class="chat-widget" role="dialog" aria-label="Asistente virtual de Xtreme Performance">
+    <div class="chat-header">
+      <div>
+        <strong>Xtreme Assist</strong>
+        <p>Tu asesor virtual</p>
+      </div>
+      <button type="button" class="close-chat" (click)="toggleChat()" aria-label="Cerrar asistente">✕</button>
+    </div>
+
+    <div class="chat-body">
+      @for (message of messages(); track $index) {
+        <div class="chat-bubble" [class.user]="message.role === 'user'" [class.assistant]="message.role === 'assistant'">
+          {{ message.content }}
+        </div>
+      }
+
+      @if (isLoading()) {
+        <div class="chat-bubble assistant typing">Escribiendo...</div>
+      }
+    </div>
+
+    <form class="chat-footer" (ngSubmit)="sendMessage()">
+      <input
+        type="text"
+        [(ngModel)]="draftMessage"
+        name="message"
+        placeholder="Escribe tu consulta..."
+        autocomplete="off"
+      />
+      <button type="submit">Enviar</button>
+    </form>
+  </div>
+}
+
 <footer id="contacto" class="footer">
   <div class="container">
     <h3>Xtreme Performance</h3>

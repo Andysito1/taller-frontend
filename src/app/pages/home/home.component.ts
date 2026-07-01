@@ -1,19 +1,28 @@
-import { Component, signal, effect, OnDestroy, inject, PLATFORM_ID, ChangeDetectionStrategy } from '@angular/core';
+import { Component, signal, OnDestroy, inject, PLATFORM_ID, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule, isPlatformBrowser, NgOptimizedImage } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ChatbotService, ChatbotMessage } from '../../services/chatbot.service';
 
 @Component({
   selector: 'app-home',
-  imports: [CommonModule, NgOptimizedImage],
+  imports: [CommonModule, FormsModule, NgOptimizedImage],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HomeComponent implements OnDestroy {
   private platformId = inject(PLATFORM_ID);
+  private readonly chatbotService = inject(ChatbotService);
   
   // Estado del slider
   currentIndex = signal(0);
   private intervalId: any;
+  isChatOpen = signal(false);
+  isLoading = signal(false);
+  draftMessage = signal('');
+  messages = signal<ChatbotMessage[]>([
+    { role: 'assistant', content: 'Hola, soy Xtreme Assist. Puedo ayudarte a conocer nuestros servicios de mantenimiento, traccionamiento, planchado y pintura premium. ¿Qué te gustaría revisar?' }
+  ]);
 
   services = signal([
     { 
@@ -54,6 +63,36 @@ export class HomeComponent implements OnDestroy {
 
   prev() {
     this.currentIndex.update(i => (i - 1 + this.services().length) % this.services().length);
+  }
+
+  toggleChat() {
+    this.isChatOpen.update(value => !value);
+  }
+
+  sendMessage() {
+    const message = this.draftMessage().trim();
+    if (!message) {
+      return;
+    }
+
+    const userMessage: ChatbotMessage = { role: 'user', content: message };
+    const nextMessages = [...this.messages(), userMessage];
+    this.messages.set(nextMessages);
+    this.draftMessage.set('');
+    this.isLoading.set(true);
+
+    this.chatbotService.sendMessage(message, nextMessages).subscribe({
+      next: (response: { reply: string; provider: string; status: string }) => {
+        this.messages.update(current => [...current, { role: 'assistant', content: response.reply }]);
+      },
+      error: () => {
+        this.messages.update(current => [...current, { role: 'assistant', content: 'Lo siento, no pude responder en este momento. Puedes escribirnos directamente o contactarnos para recibir ayuda personalizada.' }]);
+        this.isLoading.set(false);
+      },
+      complete: () => {
+        this.isLoading.set(false);
+      }
+    });
   }
 
   ngOnDestroy() {
