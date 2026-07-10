@@ -30,6 +30,6 @@ RUN echo 'server { \
 }' > /etc/nginx/conf.d/default.conf
 
 # Exponer el puerto requerido por Google Cloud Run
-EXPOSE 8081
+EXPOSE 8080
 
 CMD ["nginx", "-g", "daemon off;"]
