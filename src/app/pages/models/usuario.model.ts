@@ -19,4 +19,8 @@ export interface Usuario {
     abreviatura: string;
   };
   direccion?: string;
+  mecanico?: {
+    id: number;
+    especialidad: string;
+  };
 }

@@ -15,7 +15,7 @@
       <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg">
           <div class="modal-header bg-primary text-white">
-            <h5 class="modal-title">Registrar Nuevo Usuario</h5>
+            <h5 class="modal-title">{{ usuarioEditando() ? 'Editar Usuario' : 'Registrar Nuevo Usuario' }}</h5>
             <button type="button" class="btn-close btn-close-white" (click)="toggleForm()"></button>
           </div>
           <div class="modal-body p-4">
@@ -74,15 +74,25 @@
 
                   <div class="col-md-6">
                     <label class="form-label">Correo Electrónico</label>
-                    <input type="email" class="form-control" formControlName="correo" placeholder="correo@ejemplo.com" [class.is-invalid]="usuarioForm.get('correo')?.invalid && usuarioForm.get('correo')?.touched">
+                    <input type="email" class="form-control" formControlName="correo" placeholder="usuario@gmail.com" [class.is-invalid]="usuarioForm.get('correo')?.invalid && usuarioForm.get('correo')?.touched">
+                    @if (usuarioForm.get('correo')?.errors?.['gmail'] && usuarioForm.get('correo')?.touched) {
+                      <div class="invalid-feedback d-block">El correo debe ser una cuenta de Gmail (usuario&#64;gmail.com).</div>
+                    } @else if (usuarioForm.get('correo')?.invalid && usuarioForm.get('correo')?.touched) {
+                      <div class="invalid-feedback d-block">Ingrese un correo electrónico válido.</div>
+                    }
                   </div>
                   <div class="col-md-6">
                     <label class="form-label">Contraseña</label>
-                    <input type="password" class="form-control" formControlName="password" placeholder="Mínimo 6 caracteres" [class.is-invalid]="usuarioForm.get('password')?.invalid && usuarioForm.get('password')?.touched">
+                    <div class="input-group">
+                      <input [type]="mostrarPassword() ? 'text' : 'password'" class="form-control" formControlName="password" [placeholder]="usuarioEditando() ? 'Dejar en blanco para no cambiar' : 'Mínimo 6 caracteres'" [class.is-invalid]="usuarioForm.get('password')?.invalid && usuarioForm.get('password')?.touched">
+                      <button type="button" class="btn btn-outline-secondary" (click)="togglePasswordVisibility()" tabindex="-1">
+                        <i class="bi" [class.bi-eye]="!mostrarPassword()" [class.bi-eye-slash]="mostrarPassword()"></i>
+                      </button>
+                    </div>
                   </div>
                   <div class="col-md-6">
                     <label class="form-label">Teléfono</label>
-                    <input type="text" class="form-control" formControlName="telefono" placeholder="Opcional">
+                    <input type="text" inputmode="numeric" class="form-control" formControlName="telefono" placeholder="Solo números" (input)="onTelefonoInput($event)" [class.is-invalid]="usuarioForm.get('telefono')?.invalid && usuarioForm.get('telefono')?.touched">
                   </div>
                   <div class="col-md-12">
                     <label class="form-label">Dirección</label>
@@ -105,7 +115,7 @@
                       @if (loading()) {
                         <span class="spinner-border spinner-border-sm me-1"></span>
                       }
-                      Guardar Usuario
+                      {{ usuarioEditando() ? 'Actualizar Usuario' : 'Guardar Usuario' }}
                     </button>
                   </div>
                 }
@@ -191,6 +201,9 @@
                   </td>
                   <td class="text-end">
                     <div class="btn-group" role="group" aria-label="Acciones de usuario">
+                      <button type="button" class="btn btn-sm btn-outline-primary" (click)="editarUsuario(usuario)">
+                        Editar
+                      </button>
                       <button type="button" class="btn btn-sm btn-outline-secondary" (click)="toggleActivo(usuario.id)">
                         {{ usuario.activo ? 'Desactivar' : 'Activar' }}
                       </button>

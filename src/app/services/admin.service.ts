@@ -9,6 +9,7 @@ import { Usuario } from '../pages/models/usuario.model';
 import { Vehiculo } from '../pages/models/vehiculo.model';
 import { TipoDocumento } from '../pages/models/tipo-documento.model';
 import { Cliente } from '../pages/models/cliente.model';
+import { FinanzaServicio } from '../pages/models/finanza-servicio.model';
 import { environment } from '../../environment';
 
 // Definición de tipos para las respuestas de la API fuera de la clase
@@ -44,6 +45,10 @@ export class AdminService {
 
   createUsuario(usuario: Partial<Usuario>): Observable<Usuario> {
     return this.http.post<Usuario>(`${this.apiUrl}/usuarios`, usuario);
+  }
+
+  updateUsuario(id: number, usuario: Partial<Usuario>): Observable<Usuario> {
+    return this.http.put<Usuario>(`${this.apiUrl}/usuarios/${id}`, usuario);
   }
 
   toggleUsuarioActivo(id: number): Observable<{ activo: boolean }> {
@@ -135,5 +140,9 @@ export class AdminService {
 
   updateVehiculo(id: number, data: FormData): Observable<any> {
     return this.http.post(`${this.apiUrl}/vehiculos/${id}?_method=PUT`, data);
+  }
+
+  createFinanza(finanza: { id_orden: number; concepto: string; tipo: 'base' | 'adicional'; monto: number }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/finanzas`, finanza);
   }
 }

@@ -8,7 +8,7 @@ import {
   signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
+import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { AdminService } from '../../services/admin.service';
 import { TipoDocumento } from '../models/tipo-documento.model';
@@ -35,6 +35,8 @@ export class Usuarios implements OnInit {
   public loadingConsulta = signal(false);
   public error = signal<string | null>(null);
   public showForm = signal(false);
+  public mostrarPassword = signal(false);
+  public usuarioEditando = signal<Usuario | null>(null);
 
   // Filters
   public filtroNombre = signal<string>('');
@@ -49,15 +51,24 @@ export class Usuarios implements OnInit {
   // Formulario
   public usuarioForm = this.fb.group({
     nombre: ['', [Validators.required, Validators.minLength(3)]],
-    correo: ['', [Validators.required, Validators.email]],
+    correo: ['', [Validators.required, Validators.email, this.gmailValidator()]],
     password: ['', [Validators.required, Validators.minLength(6)]],
-    telefono: [''],
+    telefono: ['', [Validators.pattern(/^[0-9]*$/)]],
     id_rol: ['', Validators.required],
     id_tipo_documento: ['', Validators.required],
     numero_documento: ['', Validators.required],
     direccion: [''],
     especialidad: [''], // Campo dinámico
   });
+
+  // Solo permite que un correo termine en @gmail.com (incluye validación implícita de arroba)
+  private gmailValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const value = control.value as string;
+      if (!value) return null;
+      return /^[^\s@]+@gmail\.com$/i.test(value) ? null : { gmail: true };
+    };
+  }
 
   // Computed list of users
   public usuarios = computed(() => {
@@ -202,6 +213,19 @@ export class Usuarios implements OnInit {
     });
   }
 
+  togglePasswordVisibility(): void {
+    this.mostrarPassword.update((v) => !v);
+  }
+
+  // Filtra cualquier carácter que no sea un dígito mientras el usuario escribe
+  onTelefonoInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const filtrado = input.value.replace(/\D/g, '');
+    if (filtrado !== input.value) {
+      this.usuarioForm.get('telefono')?.setValue(filtrado);
+    }
+  }
+
   // --- Filter Handlers ---
   onFiltroNombreChange(event: Event): void {
     this.filtroNombre.set((event.target as HTMLInputElement).value);
@@ -225,8 +249,36 @@ export class Usuarios implements OnInit {
   toggleForm(): void {
     this.showForm.update(v => !v);
     if (!this.showForm()) {
+      this.usuarioEditando.set(null);
+      this.mostrarPassword.set(false);
       this.usuarioForm.reset({ id_rol: '', id_tipo_documento: '' });
+      this.usuarioForm.get('password')?.setValidators([Validators.required, Validators.minLength(6)]);
+      this.usuarioForm.get('password')?.updateValueAndValidity();
     }
+  }
+
+  editarUsuario(usuario: Usuario): void {
+    this.usuarioEditando.set(usuario);
+    this.mostrarPassword.set(false);
+
+    this.usuarioForm.patchValue({
+      nombre: usuario.nombre,
+      correo: usuario.correo,
+      telefono: usuario.telefono ?? '',
+      id_rol: String(usuario.id_rol),
+      id_tipo_documento: usuario.tipo_documento ? String(usuario.tipo_documento.id) : '',
+      numero_documento: usuario.numero_documento ?? '',
+      direccion: usuario.direccion ?? '',
+      especialidad: usuario.mecanico?.especialidad ?? '',
+      password: '',
+    });
+
+    // En edición la contraseña es opcional: solo se envía si el admin la escribe
+    this.usuarioForm.get('password')?.clearValidators();
+    this.usuarioForm.get('password')?.setValidators([Validators.minLength(6)]);
+    this.usuarioForm.get('password')?.updateValueAndValidity();
+
+    this.showForm.set(true);
   }
 
   saveUsuario(): void {
@@ -236,22 +288,32 @@ export class Usuarios implements OnInit {
     }
 
     this.loading.set(true);
-    // Extraemos especialidad por separado para manejar la lógica condicional sin 'delete'
-    const { especialidad, ...formValue } = this.usuarioForm.getRawValue();
-    
+    // Extraemos especialidad y password por separado para manejar su lógica condicional
+    const { especialidad, password, ...formValue } = this.usuarioForm.getRawValue();
+    const usuarioEditando = this.usuarioEditando();
+
     // Preparamos el payload convirtiendo IDs a números para el backend
-    const payload = {
+    const payload: Record<string, unknown> = {
       ...formValue,
       id_rol: Number(formValue.id_rol),
       id_tipo_documento: Number(formValue.id_tipo_documento),
       ...(this.esMecanicoSeleccionado() ? { especialidad } : {})
     };
 
-    this.adminService.createUsuario(payload as Partial<Usuario>).subscribe({
+    // En creación la contraseña siempre viaja; en edición solo si el admin la cambió
+    if (!usuarioEditando || password) {
+      payload['password'] = password;
+    }
+
+    const request$ = usuarioEditando
+      ? this.adminService.updateUsuario(usuarioEditando.id, payload as Partial<Usuario>)
+      : this.adminService.createUsuario(payload as Partial<Usuario>);
+
+    request$.subscribe({
       next: () => {
         Swal.fire({
           title: '¡Éxito!',
-          text: 'Usuario creado exitosamente',
+          text: usuarioEditando ? 'Usuario actualizado exitosamente' : 'Usuario creado exitosamente',
           icon: 'success',
           confirmButtonColor: '#198754'
         });
@@ -259,8 +321,8 @@ export class Usuarios implements OnInit {
         this.toggleForm();
       },
       error: (err) => {
-        console.error('Error al crear usuario:', err);
-        Swal.fire('Error', 'No se pudo crear el usuario. Revisa los datos.', 'error');
+        console.error('Error al guardar usuario:', err);
+        Swal.fire('Error', `No se pudo ${usuarioEditando ? 'actualizar' : 'crear'} el usuario. Revisa los datos.`, 'error');
         this.loading.set(false);
       }
     });
