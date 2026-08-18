@@ -33,6 +33,12 @@
   font-family: 'Roboto', sans-serif;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .dashboard-header {
   background: var(--card-background);
   padding: 20px 40px;

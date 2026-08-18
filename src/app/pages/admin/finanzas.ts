@@ -93,6 +93,12 @@ export class Finanzas implements OnInit {
     this.costoForm.reset({ concepto: '', tipo: 'adicional', monto: 0 });
   }
 
+  abrirParaAgregarGasto(orden: OrdenServicio): void {
+    this.ordenSeleccionada.set(orden);
+    this.costoForm.reset({ concepto: '', tipo: 'adicional', monto: 0 });
+    this.showForm.set(true);
+  }
+
   cerrarDetalle(): void {
     this.ordenSeleccionada.set(null);
     this.showForm.set(false);

@@ -95,6 +95,16 @@
       <button type="button" class="close-chat" (click)="toggleChat()" aria-label="Cerrar asistente">✕</button>
     </div>
 
+    <a
+      class="chat-whatsapp"
+      [href]="whatsappUrl"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Comunicarte con el taller por WhatsApp"
+    >
+      <span>📲</span> ¿Prefieres hablar con nosotros? Escríbenos por WhatsApp
+    </a>
+
     <div class="chat-body">
       @for (message of messages(); track $index) {
         <div class="chat-bubble" [class.user]="message.role === 'user'" [class.assistant]="message.role === 'assistant'">

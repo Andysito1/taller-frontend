@@ -8,15 +8,17 @@ import {
   computed,
   effect,
 } from '@angular/core';
-import { CommonModule, isPlatformBrowser, DatePipe } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 import { ClienteService, Seguimiento } from '../../services/cliente.service';
 import { PushNotificationService } from '../../services/push-notification.service';
+import { ThemeService } from '../../services/theme.service';
 import { Vehiculo } from '../models/vehiculo.model';
+import { ButtonDarkToggleComponent } from '../../shared/components/button-dark-toggle/button-dark-toggle-component';
 
 @Component({
   selector: 'app-cliente',
-  imports: [CommonModule, DatePipe],
+  imports: [CommonModule, ButtonDarkToggleComponent],
   templateUrl: './cliente.html',
   styleUrl: './cliente.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -27,6 +29,12 @@ export class Cliente implements OnInit {
   private clienteService = inject(ClienteService);
   private pushService = inject(PushNotificationService);
   private platformId = inject(PLATFORM_ID);
+  private themeService = inject(ThemeService);
+
+  public isDarkMode = this.themeService.isDarkMode;
+  public toggleDarkMode(): void {
+    this.themeService.toggleDarkMode();
+  }
 
   constructor() {
     // Efecto reactivo para actualizar la vista cuando llega una notificación de orden
@@ -56,10 +64,10 @@ export class Cliente implements OnInit {
 
   // Lista de servicios de la empresa (Catálogo)
   public catalogoServicios = signal([
-    { id: 1, nombre: 'Mantenimiento Preventivo', descripcion: 'Cambio de aceite, filtros y revisión general.', precio: 'S/ 150', icono: '🛠️' },
-    { id: 2, nombre: 'Alineamiento y Balanceo', descripcion: 'Optimiza la dirección y el desgaste de llantas.', precio: 'S/ 80', icono: '🛞' },
-    { id: 3, nombre: 'Escaneo Electrónico', descripcion: 'Diagnóstico computarizado de fallas de motor.', precio: 'S/ 100', icono: '💻' },
-    { id: 4, nombre: 'Sistema de Frenos', descripcion: 'Cambio de pastillas y rectificación de discos.', precio: 'S/ 120', icono: '🛑' }
+    { id: 1, nombre: 'Mantenimiento Preventivo', descripcion: 'Cambio de aceite, filtros y revisión general.', icono: '🛠️' },
+    { id: 2, nombre: 'Alineamiento y Balanceo', descripcion: 'Optimiza la dirección y el desgaste de llantas.', icono: '🛞' },
+    { id: 3, nombre: 'Escaneo Electrónico', descripcion: 'Diagnóstico computarizado de fallas de motor.', icono: '💻' },
+    { id: 4, nombre: 'Sistema de Frenos', descripcion: 'Cambio de pastillas y rectificación de discos.', icono: '🛑' }
   ]);
 
   // Contador de seguimientos pendientes derivado

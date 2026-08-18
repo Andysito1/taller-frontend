@@ -55,9 +55,14 @@
                   </td>
                   <td class="fw-bold">S/ {{ totalFinanzas(orden) | number:'1.2-2' }}</td>
                   <td class="text-end">
-                    <button class="btn btn-sm btn-outline-primary" (click)="abrirDetalle(orden)">
-                      <i class="bi bi-cash-coin"></i> Ver Costos
-                    </button>
+                    <div class="btn-group" role="group">
+                      <button class="btn btn-sm btn-outline-primary" (click)="abrirDetalle(orden)">
+                        <i class="bi bi-cash-coin"></i> Ver Costos
+                      </button>
+                      <button class="btn btn-sm btn-success" [disabled]="orden.estado === 'finalizado'" (click)="abrirParaAgregarGasto(orden)">
+                        <i class="bi bi-plus-circle"></i> Agregar Gasto
+                      </button>
+                    </div>
                   </td>
                 </tr>
               }

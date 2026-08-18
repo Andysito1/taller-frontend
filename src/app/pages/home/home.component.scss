@@ -595,6 +595,24 @@ h2 {
   cursor: pointer;
 }
 
+.chat-whatsapp {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: #1e8e5a;
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+
+.chat-whatsapp:hover {
+  background: #17703f;
+  color: white;
+}
+
 .chat-body {
   max-height: 360px;
   overflow-y: auto;

@@ -13,7 +13,9 @@ import { ChatbotService, ChatbotMessage } from '../../services/chatbot.service';
 export class HomeComponent implements OnDestroy {
   private platformId = inject(PLATFORM_ID);
   private readonly chatbotService = inject(ChatbotService);
-  
+
+  readonly whatsappUrl = 'https://api.whatsapp.com/send?phone=%2B51998980547&token=eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjEyNSJ9.eyJleHAiOjE3ODcwOTA0MTgsInBob25lIjoiKzUxOTk4OTgwNTQ3IiwiY29udGV4dCI6IkFmZ29xdUd2SHZqM1h2REJUOGdfY0hnc0tMTm1PYTBfb3VBSGtsZTFBWTNoRmFUWW8zLWVuZHIzQ0tMbGZYMWJrZ05vOXpnVFNnbUR5VldpdlE1TEczekUwV1pVYl9oNVYxSDdsVmFRWWpLMWdpTVM0dXZBVHJYWjlQRWFvaWV2Qkd0a2Rna3RzN21iY1ZZRWZLYVlqNnZqamciLCJzb3VyY2UiOiJGQl9QYWdlIiwiYXBwIjoiZmFjZWJvb2siLCJlbnRyeV9wb2ludCI6InBhZ2VfY3RhIn0.hT0Ddv5EF9F7OlTODNbMjV94EmkX2gjN8U4RDUVmtXNZzfiVtWbUiZCVxBDPAmntM8NrF0ne3h4vPVnLASe59A';
+
   // Estado del slider
   currentIndex = signal(0);
   private intervalId: any;

@@ -3,11 +3,13 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { MecanicoService } from '../../services/mecanico.service';
+import { ThemeService } from '../../services/theme.service';
 import { OrdenServicio } from '../models/orden-servicio.model';
+import { ButtonDarkToggleComponent } from '../../shared/components/button-dark-toggle/button-dark-toggle-component';
 
 @Component({
   selector: 'app-mecanico',
-  imports: [CommonModule],
+  imports: [CommonModule, ButtonDarkToggleComponent],
   templateUrl: './mecanico.html',
   styleUrl: './mecanico.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -15,6 +17,12 @@ import { OrdenServicio } from '../models/orden-servicio.model';
 export class Mecanico implements OnInit {
   private authService = inject(AuthService);
   private mecanicoService = inject(MecanicoService);
+  private themeService = inject(ThemeService);
+
+  public isDarkMode = this.themeService.isDarkMode;
+  public toggleDarkMode(): void {
+    this.themeService.toggleDarkMode();
+  }
 
   public userName = signal<string | null>(null);
   public ordenes = signal<OrdenServicio[]>([]);

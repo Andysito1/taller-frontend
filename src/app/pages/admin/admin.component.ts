@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { ThemeService } from '../../services/theme.service';
 import { ButtonDarkToggleComponent } from '../../shared/components/button-dark-toggle/button-dark-toggle-component';
 
 @Component({
@@ -12,29 +13,12 @@ import { ButtonDarkToggleComponent } from '../../shared/components/button-dark-t
 })
 export class AdminComponent {
   private authService = inject(AuthService);
-  
-  public isDarkMode = signal(this.checkInitialDarkMode());
+  private themeService = inject(ThemeService);
 
-  private checkInitialDarkMode(): boolean {
-    if (typeof window === 'undefined') return false;
-    return document.documentElement.classList.contains('dark');
-  }
+  public isDarkMode = this.themeService.isDarkMode;
 
   public toggleDarkMode(): void {
-    const newValue = !this.isDarkMode();
-    this.isDarkMode.set(newValue);
-    this.applyTheme(newValue);
-    localStorage.setItem('darkMode', newValue.toString());
-  }
-
-  private applyTheme(isDark: boolean): void {
-    if (typeof document !== 'undefined') {
-      if (isDark) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    }
+    this.themeService.toggleDarkMode();
   }
 
   logout(): void {

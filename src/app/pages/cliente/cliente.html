@@ -4,6 +4,10 @@
     <div class="user-profile">
       <div class="avatar">👤</div>
       <span class="welcome">Hola, <strong>{{ userName() }}</strong></span>
+      <app-button-dark-toggle
+        [isDarkMode]="isDarkMode()"
+        (toggleDarkMode)="toggleDarkMode()">
+      </app-button-dark-toggle>
     </div>
 
     <!-- <div class="stats-card">
@@ -66,21 +70,10 @@
           } @else if (seguimiento(); as trackInfo) {
             <div class="timeline">
               <div class="order-info">
-                <strong>Orden #{{ trackInfo.orden.id }}</strong>: {{ trackInfo.orden.titulo }}
+                <strong>🔧 Tienes 1 orden de servicio en curso</strong>
                 <span class="badge" [attr.data-status]="trackInfo.orden.estado">{{ trackInfo.orden.estado }}</span>
               </div>
-              
-              <ul class="steps">
-                @for (etapa of trackInfo.etapas; track etapa.id) {
-                  <li class="step">
-                    <div class="step-dot"></div>
-                    <div class="step-content">
-                      <span class="step-name">{{ etapa.nombre }}</span>
-                      <span class="step-date">{{ etapa.fecha | date:'short' }}</span>
-                    </div>
-                  </li>
-                }
-              </ul>
+              <p class="vehicle-basic-data">{{ selected.marca }} {{ selected.modelo }} · Placa {{ selected.placa }}</p>
             </div>
           } @else {
             <div class="no-tracking">Selecciona un vehículo para ver su progreso actual.</div>
@@ -102,7 +95,6 @@
             <div class="service-details">
               <h4>{{ servicio.nombre }}</h4>
               <p>{{ servicio.descripcion }}</p>
-              <div class="price-tag">Desde {{ servicio.precio }}</div>
             </div>
             <!-- <button class="action-btn">Consultar</button> -->
           </div>

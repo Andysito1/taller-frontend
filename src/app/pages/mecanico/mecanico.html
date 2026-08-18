@@ -5,7 +5,13 @@
       <h1>Bienvenido, {{ userName() }}</h1>
       <p>Aquí tienes un resumen de tu trabajo pendiente.</p>
     </div>
-    <button (click)="logout()" class="logout-btn">Cerrar Sesión</button>
+    <div class="header-actions">
+      <app-button-dark-toggle
+        [isDarkMode]="isDarkMode()"
+        (toggleDarkMode)="toggleDarkMode()">
+      </app-button-dark-toggle>
+      <button (click)="logout()" class="logout-btn">Cerrar Sesión</button>
+    </div>
   </header>
 
   <main class="dashboard-content">
