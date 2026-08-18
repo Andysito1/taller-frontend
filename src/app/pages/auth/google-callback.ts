@@ -30,7 +30,7 @@ export class GoogleCallback implements OnInit {
           
           // Redirección basada en rol
           const role = this.authService.userRole();
-          if (role === 'ADMIN') this.router.navigate(['/admin/ordenes']);
+          if (role === 'ADMIN') this.router.navigate(['/admin/dashboard']);
           else if (role === 'MECANICO') this.router.navigate(['/mecanico']);
           else this.router.navigate(['/cliente']);
         },

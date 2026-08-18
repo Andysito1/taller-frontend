@@ -3,10 +3,14 @@
 :host {
   --bg: var(--bg-primary);
   --bg-soft: var(--bg-secondary);
+  // La tarjeta de login es un panel oscuro fijo ("glass panel") independiente
+  // del tema claro/oscuro del sitio, por lo que su texto usa colores propios
+  // en vez de las variables de tema global (que se invierten en modo claro
+  // y quedaban ilegibles sobre este fondo, siempre oscuro).
   --panel: rgba(26, 31, 46, 0.95);
   --panel-border: rgba(220, 38, 38, 0.3);
-  --text: var(--text-primary);
-  --muted: var(--text-tertiary);
+  --text: #f5f5f7;
+  --muted: #a8a8b3;
   --accent: var(--brand-red);
   --accent-strong: #991b1b;
   --danger: #ef4444;

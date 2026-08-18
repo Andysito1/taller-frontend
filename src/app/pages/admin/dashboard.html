@@ -177,7 +177,7 @@
                     <td>{{ orden.titulo }}</td>
                     <td>{{ orden.vehiculo?.cliente?.usuario?.nombre ?? 'N/A' }}</td>
                     <td>{{ orden.vehiculo?.marca }} {{ orden.vehiculo?.modelo }} ({{ orden.vehiculo?.placa }})</td>
-                    <td><span class="badge bg-secondary">{{ getEtapaLabel(orden.estado) }}</span></td>
+                    <td><span class="badge bg-secondary">{{ getEtapaLabel(orden.etapa_actual ?? orden.estado) }}</span></td>
                   </tr>
                 }
               </tbody>

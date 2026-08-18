@@ -112,10 +112,16 @@ export class AuthService {
     }
   }
 
-  handleAuthCallback(token: string): Observable<AuthResponse> {
-    return this.http.get<AuthResponse>(`${this.apiUrl}/user`).pipe(
-      tap(response => {
-        this.setSession(token, response.data || (response as unknown as Usuario));
+  handleAuthCallback(token: string): Observable<Usuario> {
+    // Guardamos el token ANTES de la petición: el interceptor de Authorization
+    // lo lee de localStorage, así que si no está guardado aún, esta llamada
+    // saldría sin cabecera y el backend la rechazaría.
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem(this.tokenKey, token);
+    }
+    return this.http.get<Usuario>(`${this.apiUrl}/perfil`).pipe(
+      tap(user => {
+        this.setSession(token, user);
       })
     );
   }

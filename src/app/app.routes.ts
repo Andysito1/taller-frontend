@@ -35,6 +35,10 @@ export const routes: Routes = [
     pathMatch: 'full'
   },
   {
+    path: 'auth/callback',
+    loadComponent: () => import('./pages/auth/google-callback').then(m => m.GoogleCallback)
+  },
+  {
     path: 'cliente',
     loadComponent: () => import('./pages/cliente/cliente').then(m => m.Cliente),
     canActivate: [AuthGuard, RoleGuard]

@@ -19,4 +19,6 @@ export interface OrdenServicio {
     estado: 'pendiente' | 'en_proceso' | 'completado';
   }>;
   finanzas?: FinanzaServicio[];
+  /** Solo presente en la respuesta del Dashboard: etapa visible real de la orden. */
+  etapa_actual?: string;
 }
