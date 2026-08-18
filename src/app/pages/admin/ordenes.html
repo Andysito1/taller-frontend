@@ -51,6 +51,18 @@
                     <div class="invalid-feedback">Debe asignar un mecánico al servicio.</div>
                   }
                 </div>
+                <div class="col-md-6">
+                  <label for="id_servicio" class="form-label fw-bold">Servicio</label>
+                  <select id="id_servicio" class="form-select" formControlName="id_servicio" [class.is-invalid]="ordenForm.get('id_servicio')?.invalid && ordenForm.get('id_servicio')?.touched">
+                    <option value="">Seleccione un servicio</option>
+                    @for (s of allServicios(); track s.id) {
+                      <option [value]="s.id">{{ s.nombre }}</option>
+                    }
+                  </select>
+                  @if (ordenForm.get('id_servicio')?.invalid && ordenForm.get('id_servicio')?.touched) {
+                    <div class="invalid-feedback">Debe seleccionar el tipo de servicio.</div>
+                  }
+                </div>
                 <div class="col-md-12">
                   <label for="titulo" class="form-label fw-bold">Título de la Orden</label>
                   <input id="titulo" type="text" class="form-control" formControlName="titulo" placeholder="Ej: Mantenimiento de 10k KM" [class.is-invalid]="ordenForm.get('titulo')?.invalid && ordenForm.get('titulo')?.touched">

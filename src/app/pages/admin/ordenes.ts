@@ -18,6 +18,7 @@ import { OrdenServicio } from '../models/orden-servicio.model';
 import { Mecanico } from '../models/mecanico.model';
 import { Vehiculo } from '../models/vehiculo.model';
 import { FinanzaServicio } from '../models/finanza-servicio.model';
+import { Servicio } from '../models/servicio.model';
 
 @Component({
   selector: 'app-ordenes',
@@ -60,8 +61,9 @@ export class Ordenes implements OnInit {
 
   // State
   private allOrdenes = signal<OrdenServicio[]>([]);
-  public allMecanicos = signal<Mecanico[]>([]); 
+  public allMecanicos = signal<Mecanico[]>([]);
   public allVehiculos = signal<Vehiculo[]>([]);
+  public allServicios = signal<Servicio[]>([]);
   public loading = signal(true);
   public error = signal<string | null>(null);
   public showForm = signal(false);
@@ -76,6 +78,7 @@ export class Ordenes implements OnInit {
   public ordenForm = this.fb.group({
     id_vehiculo: ['', Validators.required],
     id_mecanico: ['', Validators.required],
+    id_servicio: ['', Validators.required],
     titulo: ['', [Validators.required, Validators.maxLength(100)]],
     descripcion: ['', Validators.required],
     fecha_inicio: ['', [Validators.required, this.minDateTodayValidator()]],
@@ -140,6 +143,7 @@ export class Ordenes implements OnInit {
     this.loadOrdenes();
     this.loadMecanicos(); // Cargamos los mecánicos independientemente
     this.loadVehiculos();
+    this.loadServicios();
   }
 
   public totalPrecios(orden: OrdenServicio): number {
@@ -194,6 +198,13 @@ export class Ordenes implements OnInit {
     });
   }
 
+  loadServicios(): void {
+    this.adminService.getServicios().subscribe({
+      next: (data) => this.allServicios.set(data),
+      error: (err) => console.error('Error al cargar servicios:', err)
+    });
+  }
+
   toggleForm(): void {
     this.showForm.update(v => !v);
     if (!this.showForm()) this.ordenForm.reset();
@@ -224,6 +235,7 @@ export class Ordenes implements OnInit {
       ...formValue,
       id_vehiculo: Number(formValue.id_vehiculo),
       id_mecanico: Number(formValue.id_mecanico),
+      id_servicio: Number(formValue.id_servicio),
       estado: 'diagnostico', // La orden inicia en etapa de diagnóstico
       validacion_diagnostico: 'en_espera'
     };

@@ -10,6 +10,7 @@ import { Vehiculo } from '../pages/models/vehiculo.model';
 import { TipoDocumento } from '../pages/models/tipo-documento.model';
 import { Cliente } from '../pages/models/cliente.model';
 import { FinanzaServicio } from '../pages/models/finanza-servicio.model';
+import { Servicio } from '../pages/models/servicio.model';
 import { environment } from '../../environment';
 
 // Definición de tipos para las respuestas de la API fuera de la clase
@@ -80,6 +81,12 @@ export class AdminService {
   createVehiculo(vehiculo: any): Observable<Vehiculo> {
     return this.http.post<ApiResponse<Vehiculo>>(`${this.apiUrl}/vehiculos`, vehiculo).pipe(
       map(res => ('data' in res && res.data) ? res.data : res as Vehiculo)
+    );
+  }
+
+  getServicios(): Observable<Servicio[]> {
+    return this.http.get<any>(`${this.apiUrl}/servicios-lista`).pipe(
+      map(res => this.extractData<Servicio>(res))
     );
   }
 
