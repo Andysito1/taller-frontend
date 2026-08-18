@@ -144,7 +144,7 @@ export class Ordenes implements OnInit {
 
   public totalPrecios(orden: OrdenServicio): number {
     const finanzas = orden.finanzas || [];
-    return finanzas.reduce((sum: number, finanza: FinanzaServicio) => sum + (finanza.monto || 0), 0);
+    return finanzas.reduce((sum: number, finanza: FinanzaServicio) => sum + Number(finanza.monto || 0), 0);
   }
 
   loadOrdenes(): void {

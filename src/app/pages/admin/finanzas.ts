@@ -80,7 +80,7 @@ export class Finanzas implements OnInit {
 
   public totalFinanzas(orden: OrdenServicio): number {
     const finanzas = orden.finanzas || [];
-    return finanzas.reduce((sum: number, f: FinanzaServicio) => sum + (f.monto || 0), 0);
+    return finanzas.reduce((sum: number, f: FinanzaServicio) => sum + Number(f.monto || 0), 0);
   }
 
   onFiltroBusquedaChange(event: Event): void {
