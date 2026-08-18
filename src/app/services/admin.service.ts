@@ -11,6 +11,7 @@ import { TipoDocumento } from '../pages/models/tipo-documento.model';
 import { Cliente } from '../pages/models/cliente.model';
 import { FinanzaServicio } from '../pages/models/finanza-servicio.model';
 import { Servicio } from '../pages/models/servicio.model';
+import { DashboardResumen } from '../pages/models/dashboard-resumen.model';
 import { environment } from '../../environment';
 
 // Definición de tipos para las respuestas de la API fuera de la clase
@@ -151,5 +152,11 @@ export class AdminService {
 
   createFinanza(finanza: { id_orden: number; concepto: string; tipo: 'base' | 'adicional'; monto: number }): Observable<any> {
     return this.http.post(`${this.apiUrl}/finanzas`, finanza);
+  }
+
+  getDashboardResumen(anio: number, mes: number): Observable<DashboardResumen> {
+    return this.http.get<DashboardResumen>(`${this.apiUrl}/dashboard/resumen`, {
+      params: { anio, mes }
+    });
   }
 }

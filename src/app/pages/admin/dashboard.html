@@ -1,0 +1,190 @@
+<div class="container-fluid p-4">
+  <div class="header d-flex flex-wrap justify-content-between align-items-center gap-3">
+    <div>
+      <h2>📊 Dashboard</h2>
+      <p>Resumen del taller para {{ nombreMesActual() }} {{ anioSeleccionado() }}.</p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <select class="form-select form-select-sm" [value]="mesSeleccionado()" (change)="onMesChange($event)">
+        @for (m of meses; track m.id) {
+          <option [value]="m.id">{{ m.nombre }}</option>
+        }
+      </select>
+      <select class="form-select form-select-sm" [value]="anioSeleccionado()" (change)="onAnioChange($event)">
+        @for (a of anios; track a) {
+          <option [value]="a">{{ a }}</option>
+        }
+      </select>
+      <button class="btn btn-sm btn-outline-primary" (click)="irMesActual()">
+        <i class="bi bi-calendar-check"></i> Mes actual
+      </button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="d-flex justify-content-center align-items-center" style="height: 300px;">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+  } @else if (error()) {
+    <div class="alert alert-danger" role="alert">{{ error() }}</div>
+  } @else if (resumen(); as data) {
+
+    <!-- Tarjetas resumen -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-lg-3">
+        <div class="stat-card">
+          <div class="stat-icon bg-primary-subtle text-primary"><i class="bi bi-clipboard-data"></i></div>
+          <div>
+            <div class="stat-value">{{ data.total_ordenes_mes }}</div>
+            <div class="stat-label">Órdenes del mes</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="stat-card">
+          <div class="stat-icon bg-success-subtle text-success"><i class="bi bi-check-circle"></i></div>
+          <div>
+            <div class="stat-value">{{ data.ordenes_finalizadas_mes }}</div>
+            <div class="stat-label">Finalizadas en el mes</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="stat-card">
+          <div class="stat-icon bg-warning-subtle text-warning"><i class="bi bi-gear"></i></div>
+          <div>
+            <div class="stat-value">{{ data.ordenes_activas_actual }}</div>
+            <div class="stat-label">Activas actualmente</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="stat-card">
+          <div class="stat-icon bg-info-subtle text-info"><i class="bi bi-cash-coin"></i></div>
+          <div>
+            <div class="stat-value">S/ {{ data.ingresos_mes | number:'1.2-2' }}</div>
+            <div class="stat-label">Ingresos del mes</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+      <div class="col-md-6">
+        <div class="text-muted small">
+          <i class="bi bi-info-circle"></i> Ingreso promedio por orden este mes: <strong>S/ {{ data.ingreso_promedio_orden | number:'1.2-2' }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+      <!-- Desglose por estado -->
+      <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+          <div class="card-body">
+            <h6 class="text-muted text-uppercase small fw-bold mb-3">Órdenes por etapa</h6>
+            @if (estadoBreakdown().length === 0) {
+              <p class="text-muted small mb-0">No hay órdenes registradas este mes.</p>
+            }
+            @for (item of estadoBreakdown(); track item.estado) {
+              <div class="breakdown-row">
+                <div class="d-flex justify-content-between small mb-1">
+                  <span>{{ item.label }}</span>
+                  <span class="fw-bold">{{ item.cantidad }}</span>
+                </div>
+                <div class="progress" style="height: 8px;">
+                  <div class="progress-bar" [style.width.%]="item.porcentaje"></div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Top mecánicos -->
+      <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+          <div class="card-body">
+            <h6 class="text-muted text-uppercase small fw-bold mb-3">Órdenes por mecánico (top 5)</h6>
+            @if (mecanicoBreakdown().length === 0) {
+              <p class="text-muted small mb-0">No hay órdenes registradas este mes.</p>
+            }
+            @for (item of mecanicoBreakdown(); track item.nombre) {
+              <div class="breakdown-row">
+                <div class="d-flex justify-content-between small mb-1">
+                  <span>{{ item.nombre }}</span>
+                  <span class="fw-bold">{{ item.cantidad }}</span>
+                </div>
+                <div class="progress" style="height: 8px;">
+                  <div class="progress-bar bg-success" [style.width.%]="item.porcentaje"></div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+      <!-- Por tipo de servicio -->
+      <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+          <div class="card-body">
+            <h6 class="text-muted text-uppercase small fw-bold mb-3">Órdenes por tipo de servicio</h6>
+            @if (servicioBreakdown().length === 0) {
+              <p class="text-muted small mb-0">No hay órdenes registradas este mes.</p>
+            }
+            @for (item of servicioBreakdown(); track item.nombre) {
+              <div class="breakdown-row">
+                <div class="d-flex justify-content-between small mb-1">
+                  <span>{{ item.nombre }}</span>
+                  <span class="fw-bold">{{ item.cantidad }}</span>
+                </div>
+                <div class="progress" style="height: 8px;">
+                  <div class="progress-bar bg-info" [style.width.%]="item.porcentaje"></div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla de órdenes del mes -->
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h6 class="text-muted text-uppercase small fw-bold mb-3">Órdenes registradas en {{ nombreMesActual() }}</h6>
+        @if (data.ordenes.length === 0) {
+          <p class="text-muted small mb-0">No se registraron órdenes en este periodo.</p>
+        } @else {
+          <div class="table-responsive">
+            <table class="table table-sm table-hover align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>ID</th>
+                  <th>Título</th>
+                  <th>Cliente</th>
+                  <th>Vehículo</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (orden of data.ordenes; track orden.id) {
+                  <tr>
+                    <td>{{ orden.id }}</td>
+                    <td>{{ orden.titulo }}</td>
+                    <td>{{ orden.vehiculo?.cliente?.usuario?.nombre ?? 'N/A' }}</td>
+                    <td>{{ orden.vehiculo?.marca }} {{ orden.vehiculo?.modelo }} ({{ orden.vehiculo?.placa }})</td>
+                    <td><span class="badge bg-secondary">{{ getEtapaLabel(orden.estado) }}</span></td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

@@ -50,6 +50,10 @@ export const routes: Routes = [
     canActivate: [AuthGuard, RoleGuard],
     children: [
       {
+        path: 'dashboard',
+        loadComponent: () => import('./pages/admin/dashboard').then(m => m.Dashboard)
+      },
+      {
         path: 'recordatorios',
         loadComponent: () => import('./pages/admin/recordatorios').then(m => m.Recordatorios)
       },
@@ -81,7 +85,7 @@ export const routes: Routes = [
         path: 'reportes',
         loadComponent: () => import('./pages/admin/reportes').then(m => m.Reportes)
       },
-      { path: '', redirectTo: 'clientes', pathMatch: 'full' }
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },
   {
