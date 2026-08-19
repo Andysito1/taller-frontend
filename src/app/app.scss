@@ -1,15 +1,18 @@
 @import '_color-variables.scss';
 
-// Este header/nav y el fondo que lo envuelve solo son visibles en las páginas
-// públicas (Home y Login): el resto de roles tiene su propio layout a pantalla
-// completa que los tapa. Por pedido explícito, Home y Login deben verse
-// siempre oscuros sin importar el interruptor de tema claro/oscuro global, así
-// que aquí usamos colores oscuros fijos en vez de las variables de tema.
+// IMPORTANTE: .page-container envuelve <router-outlet> para TODAS las rutas
+// (admin, cliente, mecánico incluidos, no solo Home/Login), y `color` es una
+// propiedad heredable: fijarla en oscuro aquí se filtraba hacia el texto de
+// cada página ruteada, aunque estuviera "tapada" visualmente por su propio
+// layout — de ahí que en modo claro el texto del admin quedara blanco sobre
+// blanco. Por eso este contenedor debe seguir respetando el tema global; solo
+// el header/nav de abajo (que sí es exclusivo de Home/Login, ver comentario
+// más abajo) usa colores oscuros fijos.
 .page-container {
   padding-top: 70px;
   min-height: 100vh;
-  background-color: $dark-bg-primary;
-  color: $dark-text-primary;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   transition: background-color 0.3s ease, color 0.3s ease;
 
   &.no-header {
@@ -17,6 +20,12 @@
   }
 }
 
+// Este header/nav sí es exclusivo de las páginas públicas (Home y Login): el
+// resto de roles tiene su propio layout a pantalla completa que lo tapa, y al
+// ser un <header> hermano de .page-container (no un ancestro), su color no se
+// hereda hacia el contenido ruteado. Por pedido explícito, Home y Login deben
+// verse siempre oscuros sin importar el interruptor de tema, así que aquí sí
+// usamos colores oscuros fijos.
 .header {
   position: fixed;
   top: 0;
