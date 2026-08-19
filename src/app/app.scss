@@ -1,10 +1,15 @@
 @import '_color-variables.scss';
 
+// Este header/nav y el fondo que lo envuelve solo son visibles en las páginas
+// públicas (Home y Login): el resto de roles tiene su propio layout a pantalla
+// completa que los tapa. Por pedido explícito, Home y Login deben verse
+// siempre oscuros sin importar el interruptor de tema claro/oscuro global, así
+// que aquí usamos colores oscuros fijos en vez de las variables de tema.
 .page-container {
   padding-top: 70px;
   min-height: 100vh;
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
+  background-color: $dark-bg-primary;
+  color: $dark-text-primary;
   transition: background-color 0.3s ease, color 0.3s ease;
 
   &.no-header {
@@ -17,8 +22,8 @@
   top: 0;
   width: 100%;
   height: 70px;
-  background-color: var(--bg-secondary);
-  border-bottom: 2px solid var(--border);
+  background-color: $dark-bg-secondary;
+  border-bottom: 2px solid $dark-border;
   display: flex;
   align-items: center;
   padding: 0 40px;
@@ -40,7 +45,7 @@
 
   a {
     text-decoration: none;
-    color: var(--text-secondary);
+    color: $dark-text-secondary;
     font-size: 15px;
     font-weight: 500;
     padding: 8px 12px;
@@ -48,23 +53,23 @@
     transition: $transition-smooth;
 
     &:hover {
-      color: var(--brand-red);
-      background-color: var(--bg-tertiary);
+      color: $brand-red-light;
+      background-color: $dark-bg-tertiary;
     }
 
     &.active-link {
-      color: var(--brand-red);
+      color: $brand-red-light;
       font-weight: 600;
     }
   }
 
   .welcome-text {
-    color: var(--text-secondary);
+    color: $dark-text-secondary;
     margin-right: auto;
     font-size: 14px;
 
     strong {
-      color: var(--brand-red);
+      color: $brand-red-light;
       font-weight: 600;
     }
   }
@@ -78,23 +83,23 @@
 }
 
 .login-btn {
-  color: var(--brand-red) !important;
+  color: $brand-red-light !important;
   font-weight: 600;
   font-size: 15px !important;
   padding: 8px 16px !important;
-  border: 2px solid var(--brand-red);
+  border: 2px solid $brand-red-light;
   border-radius: 6px;
   transition: $transition-smooth;
 
   &:hover {
-    background-color: var(--brand-red);
+    background-color: $brand-red-light;
     color: white !important;
   }
 }
 
 .logout-btn {
   padding: 8px 16px;
-  background: linear-gradient(135deg, var(--brand-red), var(--brand-red-dark));
+  background: linear-gradient(135deg, $brand-red-light, $brand-red-dark);
   color: white;
   border: none;
   border-radius: 6px;
@@ -120,6 +125,9 @@
   left: 0;
   width: 100vw;
   height: 100vh;
+  // A diferencia del header/nav de arriba, esta pantalla de carga inicial se
+  // ve en todos los roles (no solo Home/Login), así que sí debe respetar el
+  // interruptor de tema claro/oscuro global.
   background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
   display: flex;
   justify-content: center;

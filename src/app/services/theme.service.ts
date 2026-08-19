@@ -27,5 +27,10 @@ export class ThemeService {
   private applyTheme(isDark: boolean): void {
     if (typeof document === 'undefined') return;
     document.documentElement.classList.toggle('dark', isDark);
+    // Activa el modo oscuro nativo de Bootstrap 5.3: sin esto, componentes
+    // como .card, .table, .modal o .form-select siguen usando sus propias
+    // variables --bs-* (fondo blanco fijo) sin importar nuestras variables
+    // de tema, que solo cubren markup propio (no el de Bootstrap).
+    document.documentElement.setAttribute('data-bs-theme', isDark ? 'dark' : 'light');
   }
 }

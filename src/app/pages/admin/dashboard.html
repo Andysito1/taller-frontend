@@ -5,7 +5,8 @@
       <p>Resumen del taller para {{ nombreMesActual() }} {{ anioSeleccionado() }}.</p>
     </div>
     <div class="d-flex align-items-center gap-2">
-      <select class="form-select form-select-sm" [value]="mesSeleccionado()" (change)="onMesChange($event)">
+      <select class="form-select form-select-sm" [value]="mesSeleccionadoUI() ?? ''" (change)="onMesChange($event)">
+        <option value="" disabled hidden>Mes</option>
         @for (m of meses; track m.id) {
           <option [value]="m.id">{{ m.nombre }}</option>
         }

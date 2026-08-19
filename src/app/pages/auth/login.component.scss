@@ -1,6 +1,10 @@
 @import '../../_color-variables.scss';
 
 :host {
+  // El login, igual que el Home, es una página pública con estética oscura
+  // fija por diseño: no debe cambiar con el interruptor de tema del sitio.
+  @include dark-theme;
+
   --bg: var(--bg-primary);
   --bg-soft: var(--bg-secondary);
   // La tarjeta de login es un panel oscuro fijo ("glass panel") independiente
@@ -52,6 +56,7 @@
   backdrop-filter: blur(18px);
   animation: fadeInScale 0.45s ease-out both;
   transition: all 0.3s ease;
+  text-align: center;
 
   &:hover {
     border-color: var(--accent);
@@ -129,8 +134,9 @@
   position: relative;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 0.45rem;
-  text-align: left;
+  text-align: center;
 }
 
 .form-field label {

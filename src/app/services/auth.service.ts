@@ -40,6 +40,7 @@ export class AuthService {
 
   private readonly http = inject(HttpClient);
   private readonly platformId = inject(PLATFORM_ID);
+  private readonly router = inject(Router);
 
   public splashSubject = new Subject<void>();
 
@@ -132,8 +133,7 @@ export class AuthService {
       localStorage.removeItem(this.userKey);
     }
     this.currentUser.set(null);
-    // Inyectamos el router localmente para romper la dependencia circular
-    inject(Router).navigate(['/login']);
+    this.router.navigate(['/login']);
   }
 
   getToken(): string | null {

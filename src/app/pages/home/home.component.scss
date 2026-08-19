@@ -1,6 +1,12 @@
 @import '../../_color-variables.scss';
 
 :host {
+  // El Home es una página pública con estética oscura fija por diseño: no debe
+  // cambiar con el interruptor de tema claro/oscuro del resto del sitio. Al
+  // redeclarar aquí las variables de tema, todo lo que use var(--bg-primary),
+  // var(--text-primary), etc. dentro de este componente queda fijo en oscuro.
+  @include dark-theme;
+
   font-family: Inter, Outfit, 'Segoe UI', Arial, sans-serif;
   color: var(--text-primary);
   scroll-behavior: smooth;

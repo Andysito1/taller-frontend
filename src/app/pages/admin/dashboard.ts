@@ -40,7 +40,14 @@ export class Dashboard implements OnInit {
 
   private hoy = new Date();
   public anioSeleccionado = signal(this.hoy.getFullYear());
-  public mesSeleccionado = signal(this.hoy.getMonth() + 1); // 1-12
+  public mesSeleccionado = signal(this.hoy.getMonth() + 1); // 1-12, usado para pedir datos
+
+  // Señal solo de UI: empieza vacía para que el <select> muestre el placeholder
+  // "Mes" en vez de saltar directo a "Enero" (primera opción de la lista), lo
+  // que hacía pensar al admin que el mes activo era enero por defecto. Los
+  // datos igual cargan para el mes actual desde el inicio (ver ngOnInit);
+  // solo el rótulo del selector queda neutral hasta que el admin elige algo.
+  public mesSeleccionadoUI = signal<number | null>(null);
 
   public readonly meses = NOMBRES_MES.map((nombre, index) => ({ id: index + 1, nombre }));
   public readonly anios = Array.from({ length: 6 }, (_, i) => this.hoy.getFullYear() - i);
@@ -104,7 +111,9 @@ export class Dashboard implements OnInit {
   }
 
   onMesChange(event: Event): void {
-    this.mesSeleccionado.set(Number((event.target as HTMLSelectElement).value));
+    const mes = Number((event.target as HTMLSelectElement).value);
+    this.mesSeleccionado.set(mes);
+    this.mesSeleccionadoUI.set(mes);
     this.cargarResumen();
   }
 
@@ -114,8 +123,10 @@ export class Dashboard implements OnInit {
   }
 
   irMesActual(): void {
+    const mesActual = this.hoy.getMonth() + 1;
     this.anioSeleccionado.set(this.hoy.getFullYear());
-    this.mesSeleccionado.set(this.hoy.getMonth() + 1);
+    this.mesSeleccionado.set(mesActual);
+    this.mesSeleccionadoUI.set(mesActual);
     this.cargarResumen();
   }
 
