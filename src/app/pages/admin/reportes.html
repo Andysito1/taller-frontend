@@ -87,6 +87,31 @@
         </div>
       </div>
 
+      <!-- Sección de Selección de Estado de la Orden -->
+      <div class="services-section mb-4">
+        <label class="form-label fw-bold mb-2">📌 Incluir órdenes en estado:</label>
+        <div class="services-grid">
+          <div class="row">
+            <div class="col-md-6 col-lg-3">
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="estadoTodos" [checked]="todosEstadosMarcados" (change)="toggleTodosEstados($any($event.target).checked)">
+                <label class="form-check-label fw-bold" for="estadoTodos">Todos</label>
+              </div>
+            </div>
+          </div>
+          <div formArrayName="estados" class="row">
+            @for (estado of catalogoEstados; track $index) {
+              <div class="col-md-6 col-lg-3">
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" [formControlName]="$index" [id]="'estado' + $index">
+                  <label class="form-check-label" [for]="'estado' + $index">{{ estado.label }}</label>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
       <!-- Alerta de validación de meses -->
       @if (reportForm.hasError('rangoMesesInvalido')) {
         <div class="alert-error" style="color: #dc2626; background: #fee2e2; padding: 0.75rem; border-radius: 8px; margin-bottom: 1.5rem; font-size: 0.875rem; border: 1px solid #fecaca;">

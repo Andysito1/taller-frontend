@@ -39,6 +39,13 @@ export class Reportes implements OnInit {
     'Mantenimiento',
   ];
 
+  // Estados reales que puede tener una orden de servicio (ver OrdenServicio.estado)
+  public catalogoEstados = [
+    { value: 'en_proceso', label: 'En Proceso' },
+    { value: 'pausado', label: 'Pausado' },
+    { value: 'finalizado', label: 'Finalizado' },
+  ];
+
   public reportForm = this.fb.group({
     tipo_filtro: ['anio', [Validators.required]],
     anio: [new Date().getFullYear(), [Validators.required, Validators.min(2025), Validators.max(new Date().getFullYear())]],
@@ -46,7 +53,8 @@ export class Reportes implements OnInit {
     mes_inicio: [1],
     mes_fin: [new Date().getMonth() + 1],
     tipo_cliente: [''],
-    servicios: this.fb.array(this.catalogoServicios.map(() => new FormControl(true))) // Todos seleccionados por defecto
+    servicios: this.fb.array(this.catalogoServicios.map(() => new FormControl(true))), // Todos seleccionados por defecto
+    estados: this.fb.array(this.catalogoEstados.map(() => new FormControl(true))) // Todos los estados por defecto
   }, { validators: this.rangoMesesValidator });
 
   // Signal manual para rastrear el tipo de filtro y asegurar reactividad en el HTML
@@ -54,6 +62,19 @@ export class Reportes implements OnInit {
 
   get serviciosFormArray() {
     return this.reportForm.get('servicios') as FormArray;
+  }
+
+  get estadosFormArray() {
+    return this.reportForm.get('estados') as FormArray;
+  }
+
+  // Marca/desmarca todos los estados a la vez ("Todos")
+  public toggleTodosEstados(marcar: boolean): void {
+    this.estadosFormArray.controls.forEach(c => c.setValue(marcar));
+  }
+
+  public get todosEstadosMarcados(): boolean {
+    return this.estadosFormArray.controls.every(c => c.value === true);
   }
 
   ngOnInit(): void {
@@ -79,11 +100,18 @@ export class Reportes implements OnInit {
       tipo_filtro: rawValue.tipo_filtro,
       tipo_cliente: rawValue.tipo_cliente,
       // Mapeamos los booleanos del FormArray a los nombres de los servicios
-      servicios: this.catalogoServicios.filter((_, i) => rawValue.servicios?.[i])
+      servicios: this.catalogoServicios.filter((_, i) => rawValue.servicios?.[i]),
+      // Mapeamos los booleanos del FormArray a los valores reales del estado de la orden
+      estados: this.catalogoEstados.filter((_, i) => rawValue.estados?.[i]).map(e => e.value)
     };
 
     if (payload.servicios.length === 0) {
       Swal.fire('Atención', 'Debes seleccionar al menos un servicio para el reporte.', 'warning');
+      return;
+    }
+
+    if (payload.estados.length === 0) {
+      Swal.fire('Atención', 'Debes seleccionar al menos un estado de orden para el reporte.', 'warning');
       return;
     }
 
