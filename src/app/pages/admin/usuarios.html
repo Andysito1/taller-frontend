@@ -54,7 +54,7 @@
                   <div class="col-md-7">
                     <label class="form-label">N° Documento</label>
                     <div class="input-group">
-                      <input type="text" class="form-control" formControlName="numero_documento" placeholder="Ingrese número">
+                      <input type="text" class="form-control" formControlName="numero_documento" placeholder="Ingrese número" [class.is-invalid]="usuarioForm.get('numero_documento')?.invalid && usuarioForm.get('numero_documento')?.touched">
                       @if (getAbreviaturaSeleccionada() === 'DNI' || getAbreviaturaSeleccionada() === 'RUC') {
                         <button type="button" class="btn btn-info text-white" (click)="consultarDocumento()" [disabled]="loadingConsulta()">
                           @if (loadingConsulta()) {
@@ -65,6 +65,11 @@
                         </button>
                       }
                     </div>
+                    @if (usuarioForm.get('numero_documento')?.errors?.['docFormato'] && usuarioForm.get('numero_documento')?.touched) {
+                      <div class="invalid-feedback d-block">{{ usuarioForm.get('numero_documento')?.errors?.['docFormato'] }}</div>
+                    } @else if (usuarioForm.get('numero_documento')?.hasError('required') && usuarioForm.get('numero_documento')?.touched) {
+                      <div class="invalid-feedback d-block">El número de documento es obligatorio.</div>
+                    }
                   </div>
 
                   <div class="col-md-12">
@@ -92,7 +97,10 @@
                   </div>
                   <div class="col-md-6">
                     <label class="form-label">Teléfono</label>
-                    <input type="text" inputmode="numeric" class="form-control" formControlName="telefono" placeholder="Solo números" (input)="onTelefonoInput($event)" [class.is-invalid]="usuarioForm.get('telefono')?.invalid && usuarioForm.get('telefono')?.touched">
+                    <input type="text" inputmode="numeric" maxlength="15" class="form-control" formControlName="telefono" placeholder="Solo números (máx. 15 dígitos)" (input)="onTelefonoInput($event)" [class.is-invalid]="usuarioForm.get('telefono')?.invalid && usuarioForm.get('telefono')?.touched">
+                    @if (usuarioForm.get('telefono')?.hasError('maxlength') && usuarioForm.get('telefono')?.touched) {
+                      <div class="invalid-feedback d-block">El teléfono no puede tener más de 15 dígitos.</div>
+                    }
                   </div>
                   <div class="col-md-12">
                     <label class="form-label">Dirección</label>

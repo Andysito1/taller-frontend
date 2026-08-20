@@ -86,9 +86,11 @@
                 </div>
                 <div class="col-md-6">
                   <label for="fecha_fin" class="form-label fw-bold">Fecha Estimada de Fin</label>
-                  <input id="fecha_fin" type="date" class="form-control" formControlName="fecha_fin" [class.is-invalid]="ordenForm.get('fecha_fin')?.invalid && ordenForm.get('fecha_fin')?.touched">
-                  @if (ordenForm.get('fecha_fin')?.touched && ordenForm.get('fecha_fin')?.invalid) {
-                    <div class="invalid-feedback">El plazo es requerido y no puede ser mayor a 2 meses.</div>
+                  <input id="fecha_fin" type="date" class="form-control" formControlName="fecha_fin" [class.is-invalid]="(ordenForm.get('fecha_fin')?.invalid && ordenForm.get('fecha_fin')?.touched) || (ordenForm.hasError('fechaFinAntesDeInicio') && ordenForm.get('fecha_fin')?.touched)">
+                  @if (ordenForm.hasError('fechaFinAntesDeInicio') && ordenForm.get('fecha_fin')?.touched) {
+                    <div class="invalid-feedback d-block">La fecha de fin no puede ser anterior a la fecha de inicio.</div>
+                  } @else if (ordenForm.get('fecha_fin')?.touched && ordenForm.get('fecha_fin')?.invalid) {
+                    <div class="invalid-feedback d-block">El plazo es requerido y no puede ser mayor a 2 meses.</div>
                   }
                 </div>
 

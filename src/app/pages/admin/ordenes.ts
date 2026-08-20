@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { CommonModule, DatePipe, isPlatformBrowser } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { FormBuilder, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
+import { FormBuilder, Validators, ReactiveFormsModule, AbstractControl, AbstractControlOptions, ValidationErrors, ValidatorFn } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { AdminService } from '../../services/admin.service';
 import { PushNotificationService } from '../../services/push-notification.service';
@@ -84,9 +84,9 @@ export class Ordenes implements OnInit {
     fecha_inicio: ['', [Validators.required, this.minDateTodayValidator()]],
     fecha_fin: ['', [Validators.required, this.maxDateTwoMonthsValidator()]],
     concepto_finanza: ['', [Validators.maxLength(100)]],
-    tipo_finanza: ['base'], 
+    tipo_finanza: ['base'],
     monto_finanza: [0]
-  });
+  }, { validators: this.fechaFinNoAnteriorAInicioValidator() } as AbstractControlOptions);
 
   // Mantenemos esto para validaciones si fuera necesario, pero usaremos allVehiculos en el HTML
   public vehiculosDisponibles = computed(() => {
@@ -353,6 +353,20 @@ export class Ordenes implements OnInit {
       today.setHours(0, 0, 0, 0);
       const inputDate = new Date(control.value + 'T00:00:00'); // Evita desfase de zona horaria
       return inputDate < today ? { minDate: true } : null;
+    };
+  }
+
+  // La fecha de fin no puede ser anterior a la fecha de inicio: un servicio no puede
+  // terminar antes de haber comenzado.
+  private fechaFinNoAnteriorAInicioValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const inicio = control.get('fecha_inicio')?.value;
+      const fin = control.get('fecha_fin')?.value;
+      if (!inicio || !fin) return null;
+
+      const fechaInicio = new Date(inicio + 'T00:00:00');
+      const fechaFin = new Date(fin + 'T00:00:00');
+      return fechaFin < fechaInicio ? { fechaFinAntesDeInicio: true } : null;
     };
   }
 

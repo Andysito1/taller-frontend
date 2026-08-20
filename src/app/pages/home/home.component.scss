@@ -691,9 +691,44 @@ h2 {
   color: white;
 }
 
+.footer-contact-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  max-width: 420px;
+  margin: 16px auto 0;
+}
+
+.footer-phone,
+.footer-social {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #aaa;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: #e74c3c;
+  }
+}
+
+.footer-social svg {
+  flex-shrink: 0;
+}
+
 .copy {
   display: block;
   margin-top: 15px;
   font-size: 0.9rem;
   opacity: 0.5;
+}
+
+@media (max-width: 480px) {
+  .footer-contact-row {
+    flex-direction: column;
+    gap: 10px;
+  }
 }

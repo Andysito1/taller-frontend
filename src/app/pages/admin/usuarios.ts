@@ -53,10 +53,10 @@ export class Usuarios implements OnInit {
     nombre: ['', [Validators.required, Validators.minLength(3)]],
     correo: ['', [Validators.required, Validators.email, this.gmailValidator()]],
     password: ['', [Validators.required, Validators.minLength(6)]],
-    telefono: ['', [Validators.pattern(/^[0-9]*$/)]],
+    telefono: ['', [Validators.pattern(/^[0-9]*$/), Validators.maxLength(15)]],
     id_rol: ['', Validators.required],
     id_tipo_documento: ['', Validators.required],
-    numero_documento: ['', Validators.required],
+    numero_documento: ['', [Validators.required, this.documentoValidator()]],
     direccion: [''],
     especialidad: [''], // Campo dinámico
   });
@@ -67,6 +67,29 @@ export class Usuarios implements OnInit {
       const value = control.value as string;
       if (!value) return null;
       return /^[^\s@]+@gmail\.com$/i.test(value) ? null : { gmail: true };
+    };
+  }
+
+  // Exige el formato correcto de documento según el tipo seleccionado en el formulario:
+  // DNI (8 dígitos), RUC (11 dígitos), CE (9 dígitos) y PASAPORTE (alfanumérico, sin símbolos)
+  private documentoValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const value = (control.value as string) ?? '';
+      if (!value) return null;
+
+      switch (this.getAbreviaturaSeleccionada()) {
+        case 'DNI':
+          return /^[0-9]{8}$/.test(value) ? null : { docFormato: 'El DNI debe tener exactamente 8 dígitos numéricos.' };
+        case 'RUC':
+          return /^[0-9]{11}$/.test(value) ? null : { docFormato: 'El RUC debe tener exactamente 11 dígitos numéricos.' };
+        case 'CE':
+          return /^[0-9]{9}$/.test(value) ? null : { docFormato: 'El Carnet de Extranjería debe tener exactamente 9 dígitos numéricos.' };
+        case 'PAS':
+        case 'PASAPORTE':
+          return /^[a-zA-Z0-9]+$/.test(value) ? null : { docFormato: 'El pasaporte debe ser un código alfanumérico, sin símbolos ni espacios.' };
+        default:
+          return null;
+      }
     };
   }
 
@@ -112,6 +135,12 @@ export class Usuarios implements OnInit {
         especialidadControl?.setValue('');
       }
       especialidadControl?.updateValueAndValidity();
+    });
+
+    // El formato válido del N° de documento depende del tipo elegido, así que
+    // revalidamos numero_documento cada vez que el tipo de documento cambia.
+    this.usuarioForm.get('id_tipo_documento')?.valueChanges.subscribe(() => {
+      this.usuarioForm.get('numero_documento')?.updateValueAndValidity();
     });
   }
 
@@ -217,10 +246,10 @@ export class Usuarios implements OnInit {
     this.mostrarPassword.update((v) => !v);
   }
 
-  // Filtra cualquier carácter que no sea un dígito mientras el usuario escribe
+  // Filtra cualquier carácter que no sea un dígito y limita a 15 dígitos mientras el usuario escribe
   onTelefonoInput(event: Event): void {
     const input = event.target as HTMLInputElement;
-    const filtrado = input.value.replace(/\D/g, '');
+    const filtrado = input.value.replace(/\D/g, '').slice(0, 15);
     if (filtrado !== input.value) {
       this.usuarioForm.get('telefono')?.setValue(filtrado);
     }
