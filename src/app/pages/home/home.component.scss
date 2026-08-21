@@ -744,14 +744,20 @@ h2 {
   background: #0f0f0f;
 }
 
-.chat-footer input {
+.chat-footer textarea {
   flex: 1;
   border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 999px;
+  border-radius: 18px;
   padding: 10px 14px;
   background: #1d1d1d;
   color: white;
   outline: none;
+  resize: none;
+  font-family: inherit;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  max-height: 120px;
+  overflow-y: auto;
 }
 
 .chat-footer button {

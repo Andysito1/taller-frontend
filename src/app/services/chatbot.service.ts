@@ -1,8 +1,14 @@
 import { Injectable, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of, timeout, catchError } from 'rxjs';
 import { environment } from '../../environment';
+
+const RESPUESTA_FALLBACK = {
+  reply: 'Lo siento, no pude responder en este momento. Puedes escribirnos directamente o contactarnos para recibir ayuda personalizada.',
+  provider: 'timeout-fallback',
+  status: 'fallback',
+};
 
 export interface ChatbotMessage {
   role: 'user' | 'assistant';
@@ -25,6 +31,12 @@ export class ChatbotService {
     return this.http.post<{ reply: string; provider: string; status: string }>(`${environment.apiUrl}/chatbot/message`, {
       message,
       history,
-    });
+    }).pipe(
+      // El backend ya responde en <20s con un mensaje de respaldo si Groq falla,
+      // pero si la conexión se queda colgada (proxy, red, etc.) esto garantiza
+      // que el chat nunca se quede esperando "Escribiendo..." indefinidamente.
+      timeout(25000),
+      catchError(() => of(RESPUESTA_FALLBACK))
+    );
   }
 }

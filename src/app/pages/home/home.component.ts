@@ -1,4 +1,4 @@
-import { Component, signal, OnDestroy, OnInit, inject, PLATFORM_ID, ChangeDetectionStrategy } from '@angular/core';
+import { Component, signal, OnDestroy, OnInit, inject, PLATFORM_ID, ChangeDetectionStrategy, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule, isPlatformBrowser, NgOptimizedImage } from '@angular/common';
 import { FormsModule, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import Swal from 'sweetalert2';
@@ -21,6 +21,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   private readonly chatbotService = inject(ChatbotService);
   private readonly solicitudReservaService = inject(SolicitudReservaService);
   private readonly fb = inject(FormBuilder);
+  @ViewChild('chatTextarea') private chatTextarea?: ElementRef<HTMLTextAreaElement>;
 
   readonly whatsappUrl = 'https://api.whatsapp.com/send?phone=%2B51998980547&token=eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjEyNSJ9.eyJleHAiOjE3ODcwOTA0MTgsInBob25lIjoiKzUxOTk4OTgwNTQ3IiwiY29udGV4dCI6IkFmZ29xdUd2SHZqM1h2REJUOGdfY0hnc0tMTm1PYTBfb3VBSGtsZTFBWTNoRmFUWW8zLWVuZHIzQ0tMbGZYMWJrZ05vOXpnVFNnbUR5VldpdlE1TEczekUwV1pVYl9oNVYxSDdsVmFRWWpLMWdpTVM0dXZBVHJYWjlQRWFvaWV2Qkd0a2Rna3RzN21iY1ZZRWZLYVlqNnZqamciLCJzb3VyY2UiOiJGQl9QYWdlIiwiYXBwIjoiZmFjZWJvb2siLCJlbnRyeV9wb2ludCI6InBhZ2VfY3RhIn0.hT0Ddv5EF9F7OlTODNbMjV94EmkX2gjN8U4RDUVmtXNZzfiVtWbUiZCVxBDPAmntM8NrF0ne3h4vPVnLASe59A';
 
@@ -181,6 +182,10 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.isLoading.set(true);
     this.ofreceReserva.set(false);
 
+    if (this.chatTextarea) {
+      this.chatTextarea.nativeElement.style.height = 'auto';
+    }
+
     this.chatbotService.sendMessage(message, nextMessages).subscribe({
       next: (response: { reply: string; provider: string; status: string }) => {
         this.messages.update(current => [...current, { role: 'assistant', content: response.reply }]);
@@ -194,6 +199,19 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.isLoading.set(false);
       }
     });
+  }
+
+  onChatInputKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      this.sendMessage();
+    }
+  }
+
+  onChatInputResize(event: Event): void {
+    const textarea = event.target as HTMLTextAreaElement;
+    textarea.style.height = 'auto';
+    textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
   }
 
   irAReserva(): void {

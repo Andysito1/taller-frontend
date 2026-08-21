@@ -190,13 +190,16 @@
     </div>
 
     <form class="chat-footer" (ngSubmit)="sendMessage()">
-      <input
-        type="text"
+      <textarea
+        #chatTextarea
         [(ngModel)]="draftMessage"
         name="message"
+        rows="1"
         placeholder="Escribe tu consulta..."
         autocomplete="off"
-      />
+        (keydown)="onChatInputKeydown($event)"
+        (input)="onChatInputResize($event)"
+      ></textarea>
       <button type="submit">Enviar</button>
     </form>
   </div>
