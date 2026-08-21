@@ -28,6 +28,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   // --- Solicitud de reserva ---
   public tiposDocumento = signal<TipoDocumento[]>([]);
   public enviandoReserva = signal(false);
+  public readonly anioMaximo = new Date().getFullYear() + 1;
 
   public reservaForm = this.fb.group({
     id_tipo_documento: ['', Validators.required],
@@ -36,7 +37,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     telefono: ['', [Validators.required, Validators.pattern(/^[0-9]{1,15}$/)]],
     vehiculo_marca: ['', Validators.required],
     vehiculo_modelo: ['', Validators.required],
-    vehiculo_anio: ['', [Validators.required, Validators.min(1980), Validators.max(new Date().getFullYear() + 1)]],
+    vehiculo_anio: ['', [Validators.required, Validators.min(1950), Validators.max(this.anioMaximo)]],
     problema: ['', Validators.required],
   });
 

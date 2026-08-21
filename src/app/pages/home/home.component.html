@@ -60,6 +60,9 @@
         <div class="reserva-field">
           <label for="reserva_anio">Año del Vehículo</label>
           <input id="reserva_anio" type="number" formControlName="vehiculo_anio" placeholder="2024">
+          @if (reservaForm.get('vehiculo_anio')?.invalid && reservaForm.get('vehiculo_anio')?.touched) {
+            <small class="reserva-error">El año debe estar entre 1950 y {{ anioMaximo }}.</small>
+          }
         </div>
 
         <div class="reserva-field reserva-field-full">
