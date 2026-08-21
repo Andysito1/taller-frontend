@@ -214,16 +214,10 @@ export class HomeComponent implements OnInit, OnDestroy {
     textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
   }
 
+  // El chatbot es solo un guía/consultor: orienta al cliente y lo deriva al
+  // formulario, pero nunca completa ni modifica sus campos por él. Es el
+  // cliente quien escribe sus propios datos en el formulario de reserva.
   irAReserva(): void {
-    // El propio resumen del asistente (el mensaje que trae la frase gatillo) describe
-    // mejor el problema que el último mensaje del usuario, que suele ser solo una
-    // confirmación breve ("sí", "dale") y no el detalle de la falla.
-    const ultimoMensajeAsistente = [...this.messages()].reverse().find((m) => m.role === 'assistant');
-    if (ultimoMensajeAsistente) {
-      const resumen = ultimoMensajeAsistente.content.replace(RESERVA_TRIGGER, '').trim();
-      this.reservaForm.get('problema')?.setValue(resumen);
-    }
-
     this.isChatOpen.set(false);
     this.ofreceReserva.set(false);
 
