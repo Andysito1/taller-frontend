@@ -56,7 +56,7 @@
                     <div class="input-group">
                       <input type="text" class="form-control" formControlName="numero_documento" placeholder="Ingrese número" [class.is-invalid]="usuarioForm.get('numero_documento')?.invalid && usuarioForm.get('numero_documento')?.touched">
                       @if (getAbreviaturaSeleccionada() === 'DNI' || getAbreviaturaSeleccionada() === 'RUC') {
-                        <button type="button" class="btn btn-info text-white" (click)="consultarDocumento()" [disabled]="loadingConsulta()">
+                        <button type="button" class="btn btn-info text-white" (click)="consultarDocumento()" [disabled]="loadingConsulta() || usuarioForm.get('numero_documento')?.invalid">
                           @if (loadingConsulta()) {
                             <span class="spinner-border spinner-border-sm"></span>
                           } @else {
@@ -74,22 +74,20 @@
 
                   <div class="col-md-12">
                     <label class="form-label">Nombre Completo / Razón Social</label>
-                    <input type="text" class="form-control" formControlName="nombre" placeholder="Se completará al consultar" [class.is-invalid]="usuarioForm.get('nombre')?.invalid && usuarioForm.get('nombre')?.touched">
+                    <input type="text" class="form-control" formControlName="nombre" placeholder="Se completará al consultar o rellenado manual" [class.is-invalid]="usuarioForm.get('nombre')?.invalid && usuarioForm.get('nombre')?.touched">
                   </div>
 
                   <div class="col-md-6">
                     <label class="form-label">Correo Electrónico</label>
-                    <input type="email" class="form-control" formControlName="correo" placeholder="usuario@gmail.com" [class.is-invalid]="usuarioForm.get('correo')?.invalid && usuarioForm.get('correo')?.touched">
-                    @if (usuarioForm.get('correo')?.errors?.['gmail'] && usuarioForm.get('correo')?.touched) {
-                      <div class="invalid-feedback d-block">El correo debe ser una cuenta de Gmail (usuario&#64;gmail.com).</div>
-                    } @else if (usuarioForm.get('correo')?.invalid && usuarioForm.get('correo')?.touched) {
-                      <div class="invalid-feedback d-block">Ingrese un correo electrónico válido.</div>
+                    <input type="email" class="form-control" formControlName="correo" placeholder="usuario@dominio.com" [class.is-invalid]="usuarioForm.get('correo')?.invalid && usuarioForm.get('correo')?.touched">
+                    @if (usuarioForm.get('correo')?.invalid && usuarioForm.get('correo')?.touched) {
+                      <div class="invalid-feedback d-block">Correo inválido</div>
                     }
                   </div>
                   <div class="col-md-6">
                     <label class="form-label">Contraseña</label>
                     <div class="input-group">
-                      <input [type]="mostrarPassword() ? 'text' : 'password'" class="form-control" formControlName="password" [placeholder]="usuarioEditando() ? 'Dejar en blanco para no cambiar' : 'Mínimo 6 caracteres'" [class.is-invalid]="usuarioForm.get('password')?.invalid && usuarioForm.get('password')?.touched">
+                      <input [type]="mostrarPassword() ? 'text' : 'password'" class="form-control" formControlName="password" [placeholder]="usuarioEditando() ? 'Dejar en blanco para no cambiar' : 'Mínimo 8 caracteres'" [class.is-invalid]="usuarioForm.get('password')?.invalid && usuarioForm.get('password')?.touched">
                       <button type="button" class="btn btn-outline-secondary" (click)="togglePasswordVisibility()" tabindex="-1">
                         <i class="bi" [class.bi-eye]="!mostrarPassword()" [class.bi-eye-slash]="mostrarPassword()"></i>
                       </button>
@@ -97,7 +95,7 @@
                   </div>
                   <div class="col-md-6">
                     <label class="form-label">Teléfono</label>
-                    <input type="text" inputmode="numeric" maxlength="15" class="form-control" formControlName="telefono" placeholder="Solo números (máx. 15 dígitos)" (input)="onTelefonoInput($event)" [class.is-invalid]="usuarioForm.get('telefono')?.invalid && usuarioForm.get('telefono')?.touched">
+                    <input type="text" inputmode="numeric" maxlength="15" class="form-control" formControlName="telefono" placeholder="Ingrese numero teléfono" (input)="onTelefonoInput($event)" [class.is-invalid]="usuarioForm.get('telefono')?.invalid && usuarioForm.get('telefono')?.touched">
                     @if (usuarioForm.get('telefono')?.hasError('maxlength') && usuarioForm.get('telefono')?.touched) {
                       <div class="invalid-feedback d-block">El teléfono no puede tener más de 15 dígitos.</div>
                     }

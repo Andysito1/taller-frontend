@@ -51,8 +51,8 @@ export class Usuarios implements OnInit {
   // Formulario
   public usuarioForm = this.fb.group({
     nombre: ['', [Validators.required, Validators.minLength(3)]],
-    correo: ['', [Validators.required, Validators.email, this.gmailValidator()]],
-    password: ['', [Validators.required, Validators.minLength(6)]],
+    correo: ['', [Validators.required, this.correoValidator()]],
+    password: ['', [Validators.required, Validators.minLength(8)]],
     telefono: ['', [Validators.pattern(/^[0-9]*$/), Validators.maxLength(15)]],
     id_rol: ['', Validators.required],
     id_tipo_documento: ['', Validators.required],
@@ -61,12 +61,12 @@ export class Usuarios implements OnInit {
     especialidad: [''], // Campo dinámico
   });
 
-  // Solo permite que un correo termine en @gmail.com (incluye validación implícita de arroba)
-  private gmailValidator(): ValidatorFn {
+  // Acepta cualquier correo con formato válido (Gmail, dominios propios, .pe, .com, etc.)
+  private correoValidator(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
-      const value = control.value as string;
+      const value = (control.value as string) ?? '';
       if (!value) return null;
-      return /^[^\s@]+@gmail\.com$/i.test(value) ? null : { gmail: true };
+      return /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/.test(value) ? null : { correoInvalido: true };
     };
   }
 
@@ -202,11 +202,20 @@ export class Usuarios implements OnInit {
 
   consultarDocumento(): void {
     const id_tipo_documento = Number(this.usuarioForm.get('id_tipo_documento')?.value);
-    const numero = this.usuarioForm.get('numero_documento')?.value;
+    const numeroControl = this.usuarioForm.get('numero_documento');
+    const numero = numeroControl?.value;
     const tipo = this.getAbreviaturaSeleccionada();
 
-    if (!numero || numero.length < 8) {
-      Swal.fire('Atención', 'Ingrese un número de documento válido.', 'warning');
+    numeroControl?.markAsTouched();
+    numeroControl?.updateValueAndValidity();
+
+    const formatoValido =
+      tipo === 'DNI' ? /^[0-9]{8}$/.test(numero ?? '') :
+      tipo === 'RUC' ? /^[0-9]{11}$/.test(numero ?? '') :
+      false;
+
+    if (!formatoValido) {
+      Swal.fire('Atención', `Ingrese un número de ${tipo} válido antes de consultar.`, 'warning');
       return;
     }
 
@@ -281,7 +290,7 @@ export class Usuarios implements OnInit {
       this.usuarioEditando.set(null);
       this.mostrarPassword.set(false);
       this.usuarioForm.reset({ id_rol: '', id_tipo_documento: '' });
-      this.usuarioForm.get('password')?.setValidators([Validators.required, Validators.minLength(6)]);
+      this.usuarioForm.get('password')?.setValidators([Validators.required, Validators.minLength(8)]);
       this.usuarioForm.get('password')?.updateValueAndValidity();
     }
   }
@@ -304,7 +313,7 @@ export class Usuarios implements OnInit {
 
     // En edición la contraseña es opcional: solo se envía si el admin la escribe
     this.usuarioForm.get('password')?.clearValidators();
-    this.usuarioForm.get('password')?.setValidators([Validators.minLength(6)]);
+    this.usuarioForm.get('password')?.setValidators([Validators.minLength(8)]);
     this.usuarioForm.get('password')?.updateValueAndValidity();
 
     this.showForm.set(true);
