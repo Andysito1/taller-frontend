@@ -73,6 +73,28 @@
     </div>
 
     <div class="row g-3 mb-4">
+      <div class="col-6 col-lg-3">
+        <div class="stat-card">
+          <div class="stat-icon bg-danger-subtle text-danger"><i class="bi bi-inbox"></i></div>
+          <div>
+            <div class="stat-value">{{ data.solicitudes_pendientes }}</div>
+            <div class="stat-label">Solicitudes pendientes</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="stat-card">
+          <div class="stat-icon bg-success-subtle text-success"><i class="bi bi-graph-up-arrow"></i></div>
+          <div>
+            <div class="stat-value">{{ data.tasa_conversion_solicitudes }}%</div>
+            <div class="stat-label">Tasa de conversión de solicitudes a órdenes</div>
+            <div class="small text-muted">{{ data.solicitudes_atendidas }} atendidas / {{ data.solicitudes_rechazadas }} rechazadas</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-4">
       <div class="col-md-6">
         <div class="text-muted small">
           <i class="bi bi-info-circle"></i> Ingreso promedio por orden este mes: <strong>S/ {{ data.ingreso_promedio_orden | number:'1.2-2' }}</strong>

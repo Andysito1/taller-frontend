@@ -19,10 +19,12 @@ import { Mecanico } from '../models/mecanico.model';
 import { Vehiculo } from '../models/vehiculo.model';
 import { FinanzaServicio } from '../models/finanza-servicio.model';
 import { Servicio } from '../models/servicio.model';
+import { SolicitudReserva } from '../models/solicitud-reserva.model';
+import { SolicitudesPickerComponent } from '../../shared/components/solicitudes-picker/solicitudes-picker';
 
 @Component({
   selector: 'app-ordenes',
-  imports: [CommonModule, ReactiveFormsModule, DatePipe],
+  imports: [CommonModule, ReactiveFormsModule, DatePipe, SolicitudesPickerComponent],
   templateUrl: './ordenes.html',/*  */
   styleUrl: './ordenes.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -69,6 +71,7 @@ export class Ordenes implements OnInit {
   public showForm = signal(false);
   public showDetail = signal(false);
   public selectedOrden = signal<OrdenServicio | null>(null);
+  public solicitudesPendientes = signal<SolicitudReserva[]>([]);
 
   // Filters
   public filtroBusqueda = signal<string>('');
@@ -144,6 +147,20 @@ export class Ordenes implements OnInit {
     this.loadMecanicos(); // Cargamos los mecánicos independientemente
     this.loadVehiculos();
     this.loadServicios();
+    this.loadSolicitudesPendientes();
+  }
+
+  loadSolicitudesPendientes(): void {
+    this.adminService.getSolicitudes('pendiente').subscribe({
+      next: (data) => this.solicitudesPendientes.set(data),
+      error: (err) => console.error('Error al cargar solicitudes pendientes:', err),
+    });
+  }
+
+  usarSolicitud(solicitud: SolicitudReserva): void {
+    this.ordenForm.patchValue({
+      descripcion: solicitud.problema,
+    });
   }
 
   public totalPrecios(orden: OrdenServicio): number {

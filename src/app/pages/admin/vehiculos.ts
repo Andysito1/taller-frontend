@@ -14,11 +14,13 @@ import { AdminService } from '../../services/admin.service';
 import { Vehiculo } from '../models/vehiculo.model';
 import { Usuario } from '../models/usuario.model';
 import { Cliente } from '../models/cliente.model';
+import { SolicitudReserva } from '../models/solicitud-reserva.model';
+import { SolicitudesPickerComponent } from '../../shared/components/solicitudes-picker/solicitudes-picker';
 import { environment } from '../../../environment'; // Ajusta la ruta si tu archivo environment.ts está en otro lugar
 
 @Component({
   selector: 'app-vehiculos',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, SolicitudesPickerComponent],
   templateUrl: './vehiculos.html',
   styleUrl: './vehiculos.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -38,6 +40,7 @@ export class Vehiculos implements OnInit {
   public currentVehiculoId = signal<number | null>(null);
   public notifyingAutoReadyId: number | null = null;
   private selectedFile: File | null = null;
+  public solicitudesPendientes = signal<SolicitudReserva[]>([]);
 
   // Formulario reactivo
   public vehiculoForm = this.fb.group({
@@ -71,6 +74,22 @@ export class Vehiculos implements OnInit {
   ngOnInit(): void {
     this.loadVehiculos();
     this.loadClientes();
+    this.loadSolicitudesPendientes();
+  }
+
+  loadSolicitudesPendientes(): void {
+    this.adminService.getSolicitudes('pendiente').subscribe({
+      next: (data) => this.solicitudesPendientes.set(data),
+      error: (err) => console.error('Error al cargar solicitudes pendientes:', err),
+    });
+  }
+
+  usarSolicitud(solicitud: SolicitudReserva): void {
+    this.vehiculoForm.patchValue({
+      marca: solicitud.vehiculo_marca,
+      modelo: solicitud.vehiculo_modelo,
+      anio: String(solicitud.vehiculo_anio),
+    });
   }
 
   loadVehiculos(): void {

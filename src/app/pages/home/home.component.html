@@ -81,6 +81,72 @@
   </div>
 </section>
 
+<section id="reserva" class="section gray">
+  <div class="container narrow">
+    <h2>Solicita tu Reserva</h2>
+    <p style="opacity: 0.7; margin-bottom: 30px;">Completa tus datos y nos comunicaremos contigo para confirmar tu cita.</p>
+
+    <form class="reserva-form" [formGroup]="reservaForm" (ngSubmit)="enviarReserva()">
+      <div class="reserva-grid">
+        <div class="reserva-field">
+          <label for="reserva_tipo_doc">Tipo de Documento</label>
+          <select id="reserva_tipo_doc" formControlName="id_tipo_documento" (change)="onTipoDocumentoChange()">
+            <option value="">Seleccione tipo</option>
+            @for (tipo of tiposDocumento(); track tipo.id) {
+              <option [value]="tipo.id">{{ tipo.nombre }} ({{ tipo.abreviatura }})</option>
+            }
+          </select>
+        </div>
+        <div class="reserva-field">
+          <label for="reserva_numero_doc">N° Documento</label>
+          <input id="reserva_numero_doc" type="text" formControlName="numero_documento" placeholder="Ingrese número">
+          @if (reservaForm.get('numero_documento')?.errors?.['docFormato'] && reservaForm.get('numero_documento')?.touched) {
+            <small class="reserva-error">{{ reservaForm.get('numero_documento')?.errors?.['docFormato'] }}</small>
+          }
+        </div>
+
+        <div class="reserva-field">
+          <label for="reserva_correo">Correo Electrónico</label>
+          <input id="reserva_correo" type="email" formControlName="correo" placeholder="usuario@dominio.com">
+          @if (reservaForm.get('correo')?.invalid && reservaForm.get('correo')?.touched) {
+            <small class="reserva-error">Correo inválido</small>
+          }
+        </div>
+        <div class="reserva-field">
+          <label for="reserva_telefono">Teléfono</label>
+          <input id="reserva_telefono" type="text" inputmode="numeric" maxlength="15" formControlName="telefono" placeholder="Ingrese numero teléfono" (input)="onTelefonoReservaInput($event)">
+        </div>
+
+        <div class="reserva-field">
+          <label for="reserva_marca">Marca del Vehículo</label>
+          <input id="reserva_marca" type="text" formControlName="vehiculo_marca" placeholder="Ej: Toyota">
+        </div>
+        <div class="reserva-field">
+          <label for="reserva_modelo">Modelo del Vehículo</label>
+          <input id="reserva_modelo" type="text" formControlName="vehiculo_modelo" placeholder="Ej: Corolla">
+        </div>
+        <div class="reserva-field">
+          <label for="reserva_anio">Año del Vehículo</label>
+          <input id="reserva_anio" type="number" formControlName="vehiculo_anio" placeholder="2024">
+        </div>
+
+        <div class="reserva-field reserva-field-full">
+          <label for="reserva_problema">Problema o Servicio Requerido</label>
+          <textarea id="reserva_problema" formControlName="problema" rows="3" placeholder="Ej: Error en las bujías, requiere mantenimiento..."></textarea>
+        </div>
+      </div>
+
+      <button type="submit" class="btn primary reserva-submit" [disabled]="reservaForm.invalid || enviandoReserva()">
+        @if (enviandoReserva()) {
+          Enviando...
+        } @else {
+          Solicitar Reserva
+        }
+      </button>
+    </form>
+  </div>
+</section>
+
 <button class="chat-toggle" type="button" (click)="toggleChat()" aria-label="Abrir asistente virtual">
   <span>💬</span>
 </button>
@@ -114,6 +180,12 @@
 
       @if (isLoading()) {
         <div class="chat-bubble assistant typing">Escribiendo...</div>
+      }
+
+      @if (ofreceReserva()) {
+        <button type="button" class="btn-reserva-chat" (click)="irAReserva()">
+          Sí, quiero reservar
+        </button>
       }
     </div>
 

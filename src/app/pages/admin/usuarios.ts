@@ -14,10 +14,12 @@ import { AdminService } from '../../services/admin.service';
 import { TipoDocumento } from '../models/tipo-documento.model';
 import { Usuario } from '../models/usuario.model';
 import { Role } from '../models/role.model';
+import { SolicitudReserva } from '../models/solicitud-reserva.model';
+import { SolicitudesPickerComponent } from '../../shared/components/solicitudes-picker/solicitudes-picker';
 
 @Component({
   selector: 'app-usuarios',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, SolicitudesPickerComponent],
   templateUrl: './usuarios.html',
   styleUrl: './usuarios.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -37,6 +39,7 @@ export class Usuarios implements OnInit {
   public showForm = signal(false);
   public mostrarPassword = signal(false);
   public usuarioEditando = signal<Usuario | null>(null);
+  public solicitudesPendientes = signal<SolicitudReserva[]>([]);
 
   // Filters
   public filtroNombre = signal<string>('');
@@ -124,6 +127,7 @@ export class Usuarios implements OnInit {
     this.loadUsuarios();
     this.loadRoles();
     this.loadTiposDocumento();
+    this.loadSolicitudesPendientes();
 
     // Listener para cambiar validaciones de especialidad dinámicamente según el rol
     this.usuarioForm.get('id_rol')?.valueChanges.subscribe(() => {
@@ -183,6 +187,23 @@ export class Usuarios implements OnInit {
         ]);
       },
     });
+  }
+
+  loadSolicitudesPendientes(): void {
+    this.adminService.getSolicitudes('pendiente').subscribe({
+      next: (data) => this.solicitudesPendientes.set(data),
+      error: (err) => console.error('Error al cargar solicitudes pendientes:', err),
+    });
+  }
+
+  usarSolicitud(solicitud: SolicitudReserva): void {
+    this.usuarioForm.patchValue({
+      id_tipo_documento: String(solicitud.id_tipo_documento),
+      numero_documento: solicitud.numero_documento,
+      correo: solicitud.correo,
+      telefono: solicitud.telefono,
+    });
+    this.cdr.markForCheck();
   }
 
   // Helper para mostrar el nombre del rol en el título del formulario

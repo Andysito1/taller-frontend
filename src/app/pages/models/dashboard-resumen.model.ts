@@ -12,4 +12,8 @@ export interface DashboardResumen {
   por_mecanico: Record<string, number>;
   por_servicio: Record<string, number>;
   ordenes: OrdenServicio[];
+  solicitudes_pendientes: number;
+  solicitudes_atendidas: number;
+  solicitudes_rechazadas: number;
+  tasa_conversion_solicitudes: number;
 }

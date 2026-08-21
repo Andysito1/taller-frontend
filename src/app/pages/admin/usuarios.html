@@ -12,13 +12,15 @@
   @if (showForm()) {
     <div class="modal-backdrop fade show"></div>
     <div class="modal fade show d-block" tabindex="-1" role="dialog" aria-modal="true">
-      <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-dialog modal-dialog-centered" [class.modal-lg]="usuarioEditando()" [class.modal-xl]="!usuarioEditando()">
         <div class="modal-content border-0 shadow-lg">
           <div class="modal-header bg-primary text-white">
             <h5 class="modal-title">{{ usuarioEditando() ? 'Editar Usuario' : 'Registrar Nuevo Usuario' }}</h5>
             <button type="button" class="btn-close btn-close-white" (click)="toggleForm()"></button>
           </div>
           <div class="modal-body p-4">
+            <div class="row">
+              <div [class]="usuarioEditando() ? 'col-12' : 'col-lg-8'">
             <form [formGroup]="usuarioForm" (ngSubmit)="saveUsuario()">
               <div class="row g-3">
                 <!-- 1. Selección de Rol - Siempre visible al inicio -->
@@ -127,6 +129,16 @@
                 }
               </div>
             </form>
+              </div>
+              @if (!usuarioEditando()) {
+                <div class="col-lg-4">
+                  <app-solicitudes-picker
+                    [solicitudes]="solicitudesPendientes()"
+                    (usar)="usarSolicitud($event)"
+                  ></app-solicitudes-picker>
+                </div>
+              }
+            </div>
           </div>
         </div>
       </div>

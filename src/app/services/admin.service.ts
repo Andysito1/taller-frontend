@@ -12,6 +12,7 @@ import { Cliente } from '../pages/models/cliente.model';
 import { FinanzaServicio } from '../pages/models/finanza-servicio.model';
 import { Servicio } from '../pages/models/servicio.model';
 import { DashboardResumen } from '../pages/models/dashboard-resumen.model';
+import { SolicitudReserva, EstadoSolicitudReserva } from '../pages/models/solicitud-reserva.model';
 import { environment } from '../../environment';
 
 // Definición de tipos para las respuestas de la API fuera de la clase
@@ -158,5 +159,21 @@ export class AdminService {
     return this.http.get<DashboardResumen>(`${this.apiUrl}/dashboard/resumen`, {
       params: { anio, mes }
     });
+  }
+
+  getSolicitudes(estado?: EstadoSolicitudReserva): Observable<SolicitudReserva[]> {
+    return this.http.get<any>(`${this.apiUrl}/solicitudes-reserva`, {
+      params: estado ? { estado } : {}
+    }).pipe(
+      map(res => this.extractData<SolicitudReserva>(res))
+    );
+  }
+
+  updateEstadoSolicitud(id: number, estado: 'atendida' | 'rechazada', motivo_rechazo?: string): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/solicitudes-reserva/${id}/estado`, { estado, motivo_rechazo });
+  }
+
+  getSolicitudesPendientesCount(): Observable<{ count: number }> {
+    return this.http.get<{ count: number }>(`${this.apiUrl}/solicitudes-reserva/pendientes-count`);
   }
 }

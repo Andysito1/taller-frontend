@@ -1,3 +1,19 @@
+@if (solicitudesPendientesCount() > 0) {
+  <div class="modal-backdrop fade show"></div>
+  <div class="modal fade show d-block" tabindex="-1" role="dialog" aria-modal="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg text-center p-4">
+        <div class="display-1 mb-2">📥</div>
+        <h4 class="mb-2">¡Tienes {{ solicitudesPendientesCount() }} solicitudes nuevas!</h4>
+        <p class="text-muted mb-4">Clientes están esperando que revises su solicitud de reserva.</p>
+        <button type="button" class="btn btn-primary btn-lg" (click)="irASolicitudes()">
+          Ver solicitudes
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
 <!-- Este layout reemplaza completamente la vista pública para el rol ADMIN -->
 <div class="admin-panel">
   <aside class="sidebar">
@@ -16,6 +32,9 @@
     <nav class="sidebar-nav">
       <a routerLink="dashboard" routerLinkActive="active">
         <i class="bi bi-speedometer2 me-2"></i> Dashboard
+      </a>
+      <a routerLink="solicitudes" routerLinkActive="active">
+        <i class="bi bi-inbox me-2"></i> Solicitudes
       </a>
       <a routerLink="clientes" routerLinkActive="active">
         <i class="bi bi-people me-2"></i> Gestión de Clientes

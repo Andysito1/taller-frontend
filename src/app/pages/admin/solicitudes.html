@@ -1,0 +1,90 @@
+<div class="container-fluid p-4">
+  <div class="header">
+    <h2>📥 Solicitudes de Reserva</h2>
+    <p>Revisa las solicitudes enviadas desde la web pública y decide si se atienden o se rechazan.</p>
+  </div>
+
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-3">
+          <label for="filtroEstado" class="form-label">Estado</label>
+          <select id="filtroEstado" class="form-select" [value]="filtroEstado()" (change)="onFiltroEstadoChange($event)">
+            @for (estado of estados; track estado.value) {
+              <option [value]="estado.value">{{ estado.label }}</option>
+            }
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="d-flex justify-content-center align-items-center" style="height: 200px;">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+  } @else if (error()) {
+    <div class="alert alert-danger" role="alert">
+      <strong>Error:</strong> {{ error() }}
+    </div>
+  } @else if (solicitudes().length > 0) {
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead class="table-light">
+              <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Documento</th>
+                <th scope="col">Correo</th>
+                <th scope="col">Teléfono</th>
+                <th scope="col">Vehículo</th>
+                <th scope="col">Problema</th>
+                <th scope="col">Estado</th>
+                <th scope="col" class="text-end">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (solicitud of solicitudes(); track solicitud.id) {
+                <tr>
+                  <td>{{ solicitud.id }}</td>
+                  <td>{{ solicitud.tipo_documento?.abreviatura ?? 'N/A' }} {{ solicitud.numero_documento }}</td>
+                  <td>{{ solicitud.correo }}</td>
+                  <td>{{ solicitud.telefono }}</td>
+                  <td>{{ solicitud.vehiculo_marca }} {{ solicitud.vehiculo_modelo }} ({{ solicitud.vehiculo_anio }})</td>
+                  <td class="text-truncate" style="max-width: 220px;" [title]="solicitud.problema">{{ solicitud.problema }}</td>
+                  <td>
+                    <span class="badge" [class]="estadoBadgeClass(solicitud.estado)">
+                      {{ solicitud.estado }}
+                    </span>
+                    @if (solicitud.estado === 'rechazada' && solicitud.motivo_rechazo) {
+                      <div class="small text-muted mt-1">{{ solicitud.motivo_rechazo }}</div>
+                    }
+                  </td>
+                  <td class="text-end">
+                    @if (solicitud.estado === 'pendiente') {
+                      <div class="btn-group" role="group" aria-label="Acciones de solicitud">
+                        <button type="button" class="btn btn-sm btn-outline-success" (click)="marcarAtendida(solicitud)">
+                          Marcar atendida
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-danger" (click)="rechazarSolicitud(solicitud)">
+                          Rechazar
+                        </button>
+                      </div>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div class="alert alert-info" role="alert">
+      No hay solicitudes con el filtro actual.
+    </div>
+  }
+</div>
