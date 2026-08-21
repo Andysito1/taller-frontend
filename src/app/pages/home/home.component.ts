@@ -197,9 +197,13 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   irAReserva(): void {
-    const ultimoMensajeUsuario = [...this.messages()].reverse().find((m) => m.role === 'user');
-    if (ultimoMensajeUsuario) {
-      this.reservaForm.get('problema')?.setValue(ultimoMensajeUsuario.content);
+    // El propio resumen del asistente (el mensaje que trae la frase gatillo) describe
+    // mejor el problema que el último mensaje del usuario, que suele ser solo una
+    // confirmación breve ("sí", "dale") y no el detalle de la falla.
+    const ultimoMensajeAsistente = [...this.messages()].reverse().find((m) => m.role === 'assistant');
+    if (ultimoMensajeAsistente) {
+      const resumen = ultimoMensajeAsistente.content.replace(RESERVA_TRIGGER, '').trim();
+      this.reservaForm.get('problema')?.setValue(resumen);
     }
 
     this.isChatOpen.set(false);
