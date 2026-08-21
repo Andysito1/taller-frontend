@@ -220,7 +220,7 @@ export class Usuarios implements OnInit {
     }
 
     this.loadingConsulta.set(true);
-    this.adminService.consultarDocumento(id_tipo_documento, numero).subscribe({
+    this.adminService.consultarDocumento(id_tipo_documento, numero ?? '').subscribe({
       next: (res: any) => {
         console.log('Respuesta de API de consulta:', res);
         this.loadingConsulta.set(false);
